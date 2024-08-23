@@ -55,22 +55,12 @@ test "EffSpread - spreading 7":
 	assert {_3} is 3 with "Spread to {_3} failed"
 
 test "EffSpread - spreading 8":
-	parse:
-		spread {_1 through 10::*} across {_1}
-	assert parse logs contain "The spread target must be a list of settable expressions" with "EffSpread did not error with a single spread target"
-
-test "EffSpread - spreading 9":
 	set {_1 through 10::*} to 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10
 	spread {_1 through 10::*} across {_1} and {_2}
 	assert {_1} is 1 with "Spread to {_1} failed"
 	assert {_2} is 2 with "Spread to {_2} failed"
 
-test "EffSpread - spreading 10":
-	parse:
-		spread {_1 through 10::*} across {_1} or {_2}
-	assert first element of parse logs starts with "The spread target must be" with "EffSpread did not error with an or spread target"
-
-test "EffSpread - spreading 11":
+test "EffSpread - spreading 9":
 	spawn a cat
 	set {_cat} to last spawned cat  
 	spread 1, 2 and 3 across (metadata value "1" of {_cat}), (metadata value "2" of {_cat}) and (metadata value "3" of {_cat})
@@ -78,6 +68,12 @@ test "EffSpread - spreading 11":
 	assert metadata value "2" of {_cat} is 2 with "Incorrect spread to metadata value 2"
 	assert metadata value "3" of {_cat} is 3 with "Incorrect spread to metadata value 3"
 	delete entity within {_cat}
+
+test "EffSpread - spreading 10":
+	spread 1 and 2 across {_1}, {_2} and {_3}
+	assert {_1} is 1 with "Spread to {_1} failed"
+	assert {_2} is 2 with "Spread to {_2} failed"
+	assert {_3} is not set with "Spread to {_3} occurred when only two objects were available"
 
 test "EffSpread - parse errors":
   parse:
@@ -92,5 +88,3 @@ test "EffSpread - parse errors":
   parse:
     spread 1 across {_a::*}
   assert parse logs contain "You must provide more than one object to spread" with "A single expression was allowed as the objects to spread"
-
-
