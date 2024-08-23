@@ -70,7 +70,7 @@ public interface Changer<T> {
 		}
 		
 		/**
-		 * Tests whether an expression accepts changes of a certain type. If multiple types are given it test for whether any of the types is accepted.
+		 * Tests whether an expression accepts changes of a certain type. If multiple types are given, it tests for whether any of the types are accepted.
 		 * 
 		 * @param expression The expression to test
 		 * @param mode The ChangeMode to use in the test
@@ -91,7 +91,7 @@ public interface Changer<T> {
 		}
 
 		/**
-		 * Tests whether an expression accepts changes of a certain type. If multiple types are given it test for whether any of the types is accepted.
+		 * Tests whether an expression accepts changes of a certain type. If multiple types are given, it tests for whether any of the types are accepted.
 		 *
 		 * @param expression The expression to test
 		 * @param mode The ChangeMode to use in the test

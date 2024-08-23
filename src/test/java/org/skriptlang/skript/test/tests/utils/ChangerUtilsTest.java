@@ -1,6 +1,5 @@
 package org.skriptlang.skript.test.tests.utils;
 
-import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.Changer.ChangerUtils;
 import ch.njol.skript.classes.ClassInfo;
@@ -13,14 +12,13 @@ import ch.njol.skript.registrations.DefaultClasses;
 import ch.njol.skript.util.ClassInfoReference;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Entity;
-import org.easymock.bytebuddy.pool.TypePool;
-import org.eclipse.jdt.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ChangerUtilsTest {
 
-	@NonNull
+	@NotNull
 	private Expression<?> parseExpression(String expression) {
 		ParseResult parseResult = SkriptParser.parse(expression, "%objects%", SkriptParser.ALL_FLAGS, ParseContext.DEFAULT);
 		if (parseResult == null) {
@@ -46,7 +44,7 @@ public class ChangerUtilsTest {
 		Assert.assertTrue(ChangerUtils.acceptsChange(nameExpression, ChangeMode.SET, new ClassInfoReference(DefaultClasses.STRING, Kleenean.FALSE)));
 		Assert.assertFalse(ChangerUtils.acceptsChange(nameExpression, ChangeMode.SET, new ClassInfoReference(DefaultClasses.STRING, Kleenean.TRUE)));
 
-		Expression<?> passengersExpression = parseExpression("passengers of {_something} and {_another thing}");
+		Expression<?> passengersExpression = parseExpression("passengers of ({_something} and {_another thing})");
 		ClassInfo<?> entityClassInfo = Classes.getExactClassInfo(Entity.class);
 		if (entityClassInfo == null)
 			throw new IllegalStateException("Entity classinfo not found");
