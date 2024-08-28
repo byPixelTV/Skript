@@ -109,16 +109,18 @@ final class BukkitSyntaxInfosImpl {
 
 		@Override
 		public boolean equals(Object other) {
-			if (!(other instanceof Event) || !super.equals(other)) {
-				return false;
+			if (this == other) {
+				return true;
 			}
-			Event<?> event = (Event<?>) other;
-			return Objects.equals(name(), event.name());
+			return (other instanceof Event<?> event) &&
+					Objects.equals(defaultInfo, other) &&
+					Objects.equals(name(), event.name()) &&
+					Objects.equals(events(), event.events());
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(origin(), type(), patterns(), name(), events());
+			return Objects.hash(defaultInfo, name(), events());
 		}
 
 		@Override
@@ -127,6 +129,7 @@ final class BukkitSyntaxInfosImpl {
 					.add("origin", origin())
 					.add("type", type())
 					.add("patterns", patterns())
+					.add("priority", priority())
 					.add("name", name())
 					.add("events", events())
 					.toString();

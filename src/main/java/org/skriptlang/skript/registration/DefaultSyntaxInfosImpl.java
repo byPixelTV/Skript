@@ -15,7 +15,7 @@ final class DefaultSyntaxInfosImpl {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static class ExpressionImpl<E extends ch.njol.skript.lang.Expression<R>, R>
+	static class ExpressionImpl<E extends ch.njol.skript.lang.Expression<R>, R>
 		extends SyntaxInfoImpl<E> implements DefaultSyntaxInfos.Expression<E, R> {
 
 		private final Class<R> returnType;
@@ -36,16 +36,14 @@ final class DefaultSyntaxInfosImpl {
 
 		@Override
 		public boolean equals(Object other) {
-			if (!(other instanceof Expression) || !super.equals(other)) {
-				return false;
-			}
-			ExpressionImpl<?, ?> expression = (ExpressionImpl<?, ?>) other;
-			return returnType() == expression.returnType();
+			return other instanceof Expression<?, ?> expression &&
+					super.equals(other) &&
+					returnType() == expression.returnType();
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(origin(), type(), patterns(), returnType());
+			return Objects.hash(super.hashCode(), returnType());
 		}
 
 		@Override
@@ -54,6 +52,7 @@ final class DefaultSyntaxInfosImpl {
 					.add("origin", origin())
 					.add("type", type())
 					.add("patterns", patterns())
+					.add("priority", priority())
 					.add("returnType", returnType())
 					.toString();
 		}
@@ -89,7 +88,7 @@ final class DefaultSyntaxInfosImpl {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static class StructureImpl<E extends org.skriptlang.skript.lang.structure.Structure>
+	static class StructureImpl<E extends org.skriptlang.skript.lang.structure.Structure>
 		extends SyntaxInfoImpl<E> implements DefaultSyntaxInfos.Structure<E> {
 
 		private final @Nullable EntryValidator entryValidator;
@@ -119,16 +118,15 @@ final class DefaultSyntaxInfosImpl {
 
 		@Override
 		public boolean equals(Object other) {
-			if (!(other instanceof Structure) || !super.equals(other)) {
-				return false;
-			}
-			Structure<?> structure = (Structure<?>) other;
-			return Objects.equals(entryValidator(), structure.entryValidator());
+			return other instanceof Structure<?> structure &&
+					super.equals(other) &&
+					Objects.equals(entryValidator(), structure.entryValidator()) &&
+					Objects.equals(nodeType(), structure.nodeType());
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(origin(), type(), patterns(), entryValidator());
+			return Objects.hash(super.hashCode(), entryValidator(), nodeType());
 		}
 
 		@Override
@@ -137,6 +135,7 @@ final class DefaultSyntaxInfosImpl {
 					.add("origin", origin())
 					.add("type", type())
 					.add("patterns", patterns())
+					.add("priority", priority())
 					.add("entryValidator", entryValidator())
 					.toString();
 		}

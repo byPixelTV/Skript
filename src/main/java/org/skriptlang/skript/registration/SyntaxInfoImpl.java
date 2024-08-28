@@ -75,18 +75,16 @@ class SyntaxInfoImpl<T extends SyntaxElement> implements SyntaxInfo<T> {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof SyntaxInfo)) {
-			return false;
-		}
-		SyntaxInfo<?> info = (SyntaxInfo<?>) other;
-		return Objects.equals(origin(), info.origin()) &&
+		return other instanceof SyntaxInfo<?> info &&
+				Objects.equals(origin(), info.origin()) &&
 				Objects.equals(type(), info.type()) &&
-				Objects.equals(patterns(), info.patterns());
+				Objects.equals(patterns(), info.patterns()) &&
+				Objects.equals(priority(), info.priority());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(origin(), type(), patterns());
+		return Objects.hash(origin(), type(), patterns(), priority());
 	}
 
 	@Override
@@ -95,6 +93,7 @@ class SyntaxInfoImpl<T extends SyntaxElement> implements SyntaxInfo<T> {
 				.add("origin", origin())
 				.add("type", type())
 				.add("patterns", patterns())
+				.add("priority", priority())
 				.toString();
 	}
 
