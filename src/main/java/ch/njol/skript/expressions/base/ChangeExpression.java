@@ -66,8 +66,9 @@ public abstract class ChangeExpression<T, C> extends SimpleExpression<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public final void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
-		throw new UnsupportedOperationException("ChangeExpression can only be changed from it's 'changing' method in EffChange.");
+		changing(event, (@Nullable C[]) delta, mode);
 	}
 
 }
