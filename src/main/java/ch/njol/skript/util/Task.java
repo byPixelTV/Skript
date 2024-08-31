@@ -166,10 +166,10 @@ public abstract class Task implements Runnable, Closeable {
 				Skript.exception(e);
 			}
 		}
-		Future<T> future = TaskManager.submitSafely(callable);
 		try {
+			Future<T> future = TaskManager.submitSafely(callable);
 			return future.get();
-		} catch (ExecutionException | InterruptedException e) {
+		} catch (Exception e) {
 			Skript.exception(e);
 			return null;
 		}
