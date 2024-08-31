@@ -47,6 +47,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.lang.util.SimpleLiteral;
+import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.chat.BungeeConverter;
 import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
@@ -120,7 +121,7 @@ public class ExprSignText extends SimpleExpression<String> {
 			if (line < 0 || line > 3)
 				return new String[0];
 		}
-		if (getTime() >= 0 && event instanceof SignChangeEvent && blocks.check(event, block -> block.equals(((SignChangeEvent) event).getBlock()))) {
+		if (getTime() >= EventValues.TIME_PAST && event instanceof SignChangeEvent && blocks.check(event, block -> block.equals(((SignChangeEvent) event).getBlock()))) {
 			if (multipleLines)
 				return ((SignChangeEvent) event).getLines();
 			return new String[] {((SignChangeEvent) event).getLine(line)};

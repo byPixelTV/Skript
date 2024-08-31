@@ -1550,7 +1550,7 @@ public class BukkitClasses {
 				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
 				.since("2.8.0"));
 
-    if (Skript.isRunningMinecraft(1, 20))
+		if (Skript.isRunningMinecraft(1, 20))
 			Classes.registerClass(new EnumClassInfo<>(Side.class, "signside", "sign sides")
 					.user("sign ?sides?")
 					.name("Sign Sides")

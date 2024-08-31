@@ -469,7 +469,6 @@ public final class BukkitEventValues {
 		if (Skript.isRunningMinecraft(1, 20))
 			EventValues.registerEventValue(SignChangeEvent.class, Side.class, new Getter<Side, SignChangeEvent>() {
 				@Override
-				@Nullable
 				public Side get(SignChangeEvent event) {
 					return event.getSide();
 				}
