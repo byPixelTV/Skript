@@ -22,17 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
-import org.bukkit.block.sign.SignSide;
-import org.bukkit.event.Event;
-import org.bukkit.event.block.SignChangeEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.Lists;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.AdventureSetSignLine;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -53,6 +42,18 @@ import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
+
+import com.google.common.collect.Lists;
+
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
+import org.bukkit.event.Event;
+import org.bukkit.event.block.SignChangeEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 
 @Name("Sign Text")
