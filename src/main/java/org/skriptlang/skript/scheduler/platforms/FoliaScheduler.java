@@ -22,7 +22,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.plugin.Plugin;
 import org.skriptlang.skript.scheduler.AsyncTask;
 import org.skriptlang.skript.scheduler.PlatformScheduler;
 import org.skriptlang.skript.scheduler.Task;
@@ -65,7 +64,7 @@ public class FoliaScheduler implements PlatformScheduler {
 	}
 
 	@Override
-	public void cancelAll(Plugin plugin) {
+	public void cancelAll() {
 		// TODO Auto-generated method stub
 		
 	}
