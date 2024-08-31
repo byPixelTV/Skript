@@ -18,12 +18,13 @@
  */
 package org.skriptlang.skript.scheduler;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import org.bukkit.plugin.Plugin;
 
 /**
  * Represents a Task for a dedicated platform like Sponge, Paper, Bukkit or Folia.
+ * See {@link TaskManager} for detailed Javadoc mirrored methods.
  */
 public interface PlatformScheduler {
 
@@ -39,6 +40,8 @@ public interface PlatformScheduler {
 
 	boolean isAlive(AsyncTask task);
 
-	void cancelAll(Plugin plugin);
+	void cancelAll();
+
+	<T> Future<T> submitSafely(Callable<T> callable) throws Exception;
 
 }

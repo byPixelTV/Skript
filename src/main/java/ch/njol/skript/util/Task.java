@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
+import org.skriptlang.skript.scheduler.TaskManager;
 
 import ch.njol.skript.Skript;
 import ch.njol.util.Closeable;
@@ -142,25 +143,13 @@ public abstract class Task implements Runnable, Closeable {
 				schedule(period);
 		}
 	}
-	
-	/**
-	 * Equivalent to <tt>{@link #callSync(Callable, Plugin) callSync}(c, {@link Skript#getInstance()})</tt>
-	 * 
-	 * @deprecated callSync has been moved in to {@link org.skriptlang.skript.scheduler.platforms.SpigotScheduler#callSync(Callable)} and you must cast
-	 * {@link org.skriptlang.skript.scheduler.TaskManager#getScheduler()} to {@link org.skriptlang.skript.scheduler.platforms.SpigotScheduler} for access.
-	 */
-	@Nullable
-	@Deprecated
-	public static <T> T callSync(final Callable<T> c) {
-		return callSync(c, Skript.getInstance());
-	}
-	
+
 	/**
 	 * Calls a method on Bukkit's main thread.
 	 * <p>
 	 * Hint: Use a Callable&lt;Void&gt; to make a task which blocks your current thread until it is completed.
 	 * 
-	 * @param c The method
+	 * @param callable The method
 	 * @param p The plugin that owns the task. Must be enabled.
 	 * @return What the method returned or null if it threw an error or was stopped (usually due to the server shutting down)
 	 * 
@@ -169,25 +158,21 @@ public abstract class Task implements Runnable, Closeable {
 	 */
 	@Nullable
 	@Deprecated
-	public static <T> T callSync(final Callable<T> c, final Plugin p) {
+	public static <T> T callSync(Callable<T> callable) {
 		if (Bukkit.isPrimaryThread()) {
 			try {
-				return c.call();
+				return callable.call();
 			} catch (final Exception e) {
 				Skript.exception(e);
 			}
 		}
-		final Future<T> f = Bukkit.getScheduler().callSyncMethod(p, c);
+		Future<T> future = TaskManager.submitSafely(callable);
 		try {
-			while (true) {
-				try {
-					return f.get();
-				} catch (final InterruptedException e) {}
-			}
-		} catch (final ExecutionException e) {
+			return future.get();
+		} catch (ExecutionException | InterruptedException e) {
 			Skript.exception(e);
-		} catch (final CancellationException e) {} catch (final ThreadDeath e) {}// server shutting down
-		return null;
+			return null;
+		}
 	}
-	
+
 }

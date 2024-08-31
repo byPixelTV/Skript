@@ -18,6 +18,8 @@
  */
 package org.skriptlang.skript.scheduler.platforms;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.plugin.Plugin;
@@ -30,7 +32,6 @@ public class FoliaScheduler implements PlatformScheduler {
 	@Override
 	public void run(Task task, long delayInTicks) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -67,6 +68,12 @@ public class FoliaScheduler implements PlatformScheduler {
 	public void cancelAll(Plugin plugin) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public <T> Future<T> submitSafely(Callable<T> callable) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

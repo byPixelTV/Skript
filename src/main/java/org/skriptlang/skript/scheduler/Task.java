@@ -26,6 +26,8 @@ import ch.njol.util.Closeable;
 /**
  * Represents a Task that only calls it's runnable synchronous.
  * Unless otherwise defined by the scheduler like Folia.
+ * <p>
+ * See {@link AsyncTask} for asynchronous tasks.
  */
 public abstract class Task implements Runnable, Closeable {
 

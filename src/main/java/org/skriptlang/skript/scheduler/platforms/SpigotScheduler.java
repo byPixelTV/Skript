@@ -18,28 +18,27 @@
  */
 package org.skriptlang.skript.scheduler.platforms;
 
-import java.util.WeakHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import ch.njol.skript.Skript;
+
+import com.google.common.collect.MapMaker;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.eclipse.jdt.annotation.Nullable;
 import org.skriptlang.skript.scheduler.AsyncTask;
 import org.skriptlang.skript.scheduler.PlatformScheduler;
 import org.skriptlang.skript.scheduler.Task;
 
-import ch.njol.skript.Skript;
-
 public class SpigotScheduler implements PlatformScheduler {
 
-	private static final Map<Integer, AsyncTask> asyncTasks = new WeakHashMap<>();
-	private static final Map<Integer, Task> tasks = new WeakHashMap<>();
+	private static final ConcurrentMap<Integer, AsyncTask> asyncTasks = new MapMaker().weakKeys().weakValues().makeMap();
+	private static final ConcurrentMap<Integer, Task> tasks = new MapMaker().weakKeys().weakValues().makeMap();
 
 	@Override
 	public void run(Task task, long delayInTicks) {
@@ -111,48 +110,18 @@ public class SpigotScheduler implements PlatformScheduler {
 	}
 
 	@Override
-	public void cancelAll(Plugin plugin) {
+	public void cancelAll() {
+		Plugin plugin = Skript.getInstance();
 		asyncTasks.values().stream().filter(task -> task.getPlugin().equals(plugin)).forEach(task -> this.cancel(task));
 		tasks.values().stream().filter(task -> task.getPlugin().equals(plugin)).forEach(task -> this.cancel(task));
 	}
 
-	/**
-	 * Equivalent to <tt>{@link #callSync(Callable, Plugin) callSync}(c, {@link Skript#getInstance()})</tt>
-	 */
-	@Nullable
-	public static <T> T callSync(Callable<T> callable) {
-		return callSync(callable, Skript.getInstance());
-	}
-
-	/**
-	 * Calls a method on Bukkit's main thread.
-	 * <p>
-	 * Hint: Use a Callable&lt;Void&gt; to make a task which blocks your current thread until it is completed.
-	 * 
-	 * @param callable The method
-	 * @param plugin The plugin that owns the task. Must be enabled.
-	 * @return What the method returned or null if it threw an error or was stopped (usually due to the server shutting down)
-	 */
-	@Nullable
-	public static <T> T callSync(Callable<T> callable, Plugin plugin) {
+	@Override
+	public <T> Future<T> submitSafely(Callable<T> callable) throws Exception {
 		if (Bukkit.isPrimaryThread()) {
-			try {
-				return callable.call();
-			} catch (Exception e) {
-				Skript.exception(e);
-			}
+			return CompletableFuture.completedFuture(callable.call());
 		}
-		Future<T> future = Bukkit.getScheduler().callSyncMethod(plugin, callable);
-		try {
-			while (true) {
-				try {
-					return future.get();
-				} catch (InterruptedException e) {}
-			}
-		} catch (ExecutionException e) {
-			Skript.exception(e);
-		} catch (CancellationException | ThreadDeath e) {} // server shutting down
-		return null;
+		return Bukkit.getScheduler().callSyncMethod(Skript.getInstance(), callable);
 	}
 
 }

@@ -18,9 +18,10 @@
  */
 package org.skriptlang.skript.scheduler;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.plugin.Plugin;
 import org.skriptlang.skript.scheduler.platforms.FoliaScheduler;
 import org.skriptlang.skript.scheduler.platforms.SpigotScheduler;
 
@@ -49,6 +50,9 @@ public class TaskManager {
 		}
 	}
 
+	/**
+	 * @return the registered {@link PlatformScheduler} currently running for Skript.
+	 */
 	public PlatformScheduler getScheduler() {
 		return scheduler;
 	}
@@ -77,8 +81,24 @@ public class TaskManager {
 		return scheduler.isAlive(task);
 	}
 
-	public static void cancelAll(Plugin plugin) {
-		scheduler.cancelAll(plugin);
+	/**
+	 * Cancel all tasks.
+	 */
+	public static void cancelAll() {
+		scheduler.cancelAll();
+	}
+
+	/**
+	 * Submits a callable to the main server thread.
+	 * This is depending on the scheduler, if Spigot, will run sync to the main server thread.
+	 * 
+	 * @param <T>
+	 * @param callable The callable to execute and return result with.
+	 * @return Future to handle execution or any thread errors.
+	 * @throws Exception if the callable computation is unable to do so.
+	 */
+	public static <T> Future<T> submitSafely(Callable<T> callable) throws Exception {
+		return scheduler.submitSafely(callable);
 	}
 
 }
