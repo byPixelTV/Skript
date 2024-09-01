@@ -26,7 +26,7 @@ import ch.njol.skript.Skript;
 import ch.njol.util.Closeable;
 
 /**
- * Represents a Task that only calls it's runnable asyncronously from the main server thread.
+ * Represents a Task that calls its runnable asynchronously from the main server thread.
  */
 public abstract class AsyncTask implements Runnable, Closeable {
 
