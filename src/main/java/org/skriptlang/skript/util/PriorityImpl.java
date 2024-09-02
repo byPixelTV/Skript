@@ -38,23 +38,29 @@ class PriorityImpl implements Priority {
 			return 0;
 		}
 
+		Collection<Priority> ourBefore = this.before();
+		Collection<Priority> otherAfter = other.after();
+
 		// check whether this is known to be before other and whether other is known to be after this
-		if (this.before().contains(other) || other.after().contains(this)) {
+		if (ourBefore.contains(other) || otherAfter.contains(this)) {
 			return -1;
 		}
 
+		Collection<Priority> ourAfter = this.after();
+		Collection<Priority> otherBefore = other.before();
+
 		// check whether this is known to be after other and whether other is known to be before this
-		if (this.after().contains(other) || other.before().contains(this)) {
+		if (ourAfter.contains(other) || otherBefore.contains(this)) {
 			return 1;
 		}
 
 		// check whether the set of items we are before has common elements with the set of items other is after
-		if (this.before().stream().anyMatch(other.after()::contains)) {
+		if (ourBefore.stream().anyMatch(otherAfter::contains)) {
 			return -1;
 		}
 
 		// check whether the set of items we are after has common elements with the set of items other is before
-		if (this.after().stream().anyMatch(other.before()::contains)) {
+		if (ourAfter.stream().anyMatch(otherBefore::contains)) {
 			return 1;
 		}
 

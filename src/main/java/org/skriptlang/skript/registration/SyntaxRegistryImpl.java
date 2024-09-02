@@ -1,10 +1,12 @@
 package org.skriptlang.skript.registration;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 final class SyntaxRegistryImpl implements SyntaxRegistry {
@@ -93,25 +95,24 @@ final class SyntaxRegistryImpl implements SyntaxRegistry {
 		}
 
 		@Override
-		public int hashCode() {
-			return name.hashCode();
-		}
-
-		@Override
 		public boolean equals(Object other) {
 			if (this == other) {
 				return true;
 			}
-			if (!(other instanceof Key<?>)) {
-				return false;
-			}
-			Key<?> key = (Key<?>) other;
-			return name().equals(key.name());
+			return other instanceof Key<?> key &&
+					name().equals(key.name());
+		}
+
+		@Override
+		public int hashCode() {
+			return name().hashCode();
 		}
 
 		@Override
 		public String toString() {
-			return name;
+			return MoreObjects.toStringHelper(this)
+					.add("name", name())
+					.toString();
 		}
 
 	}
@@ -128,6 +129,26 @@ final class SyntaxRegistryImpl implements SyntaxRegistry {
 		@Override
 		public Key<P> parent() {
 			return parent;
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			return other instanceof ChildKey<?, ?> key &&
+					super.equals(other) &&
+					parent().equals(key.parent());
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(super.hashCode(), parent());
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("name", name())
+					.add("parent", parent())
+					.toString();
 		}
 
 	}
