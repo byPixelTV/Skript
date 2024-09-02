@@ -61,8 +61,10 @@ public enum ExpressionType {
 	 */
 	PATTERN_MATCHES_EVERYTHING(SyntaxInfo.PATTERN_MATCHES_EVERYTHING);
 
+	@ApiStatus.Experimental
 	private final Priority priority;
 
+	@ApiStatus.Experimental
 	ExpressionType(Priority priority) {
 		this.priority = priority;
 	}
@@ -75,9 +77,8 @@ public enum ExpressionType {
 		return priority;
 	}
 
-	@Nullable
 	@ApiStatus.Experimental
-	public static ExpressionType fromModern(Priority priority) {
+	public static @Nullable ExpressionType fromModern(Priority priority) {
 		if (priority == SyntaxInfo.SIMPLE)
 			return ExpressionType.SIMPLE;
 		if (priority == EventValueExpression.DEFAULT_PRIORITY)
