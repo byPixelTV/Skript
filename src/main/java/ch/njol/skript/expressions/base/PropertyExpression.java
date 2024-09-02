@@ -57,23 +57,25 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 	/**
 	 * Registers an expression with the two default property patterns "property of %types%" and "%types%'[s] property"
 	 *
-	 * @param registry the SyntaxRegistry to register this PropertyExpression with.
-	 * @param expressionClass the PropertyExpression class being registered.
-	 * @param type the main expression type the property is based off of.
-	 * @param property the name of the property.
-	 * @param fromType should be plural to support multiple objects but doesn't have to be.
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param expressionClass The PropertyExpression class being registered.
+	 * @param returnType The class representing the expression's return type.
+	 * @param property The name of the property.
+	 * @param fromType Should be plural to support multiple objects but doesn't have to be.
+	 * @param <T> The return type.
+	 * @param <E> The Expression type.
+	 * @return The registered {@link SyntaxInfo}.
 	 */
 	@ApiStatus.Experimental
-	public static <T> void register(SyntaxRegistry registry, Class<? extends Expression<T>> expressionClass, Class<T> type, String property, String fromType) {
-		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(expressionClass)
-				.returnType(type)
+	public static <E extends Expression<T>, T> SyntaxInfo.Expression<E, T> register(SyntaxRegistry registry, Class<E> expressionClass, Class<T> returnType, String property, String fromType) {
+		SyntaxInfo.Expression<E, T> info = SyntaxInfo.Expression.builder(expressionClass)
+				.returnType(returnType)
 				.priority(DEFAULT_PRIORITY)
-				.addPatterns(
-						"[the] " + property + " of %" + fromType + "%",
-						"%" + fromType + "%'[s] " + property
-				)
-				.build()
-		);
+				.addPatterns("[the] " + property + " of %" + fromType + "%",
+						"%" + fromType + "%'[s] " + property)
+				.build();
+		registry.register(SyntaxRegistry.EXPRESSION, info);
+		return info;
 	}
 
 	/**
@@ -92,23 +94,25 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 	 * Registers an expression with the two default property patterns "property [of %types%]" and "%types%'[s] property"
 	 * This method also makes the expression type optional to force a default expression on the property expression.
 	 *
-	 * @param registry the SyntaxRegistry to register this PropertyExpression with.
-	 * @param expressionClass the PropertyExpression class being registered.
-	 * @param type the main expression type the property is based off of.
-	 * @param property the name of the property.
-	 * @param fromType should be plural to support multiple objects but doesn't have to be.
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param expressionClass The PropertyExpression class being registered.
+	 * @param returnType The class representing the expression's return type.
+	 * @param property The name of the property.
+	 * @param fromType Should be plural to support multiple objects but doesn't have to be.
+	 * @param <T> The return type.
+	 * @param <E> The Expression type.
+	 * @return The registered {@link SyntaxInfo}.
 	 */
 	@ApiStatus.Experimental
-	public static <T> void registerDefault(SyntaxRegistry registry, Class<? extends Expression<T>> expressionClass, Class<T> type, String property, String fromType) {
-		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(expressionClass)
-				.returnType(type)
+	public static <E extends Expression<T>, T> SyntaxInfo.Expression<E, T> registerDefault(SyntaxRegistry registry, Class<E> expressionClass, Class<T> returnType, String property, String fromType) {
+		SyntaxInfo.Expression<E, T> info = SyntaxInfo.Expression.builder(expressionClass)
+				.returnType(returnType)
 				.priority(DEFAULT_PRIORITY)
-				.addPatterns(
-						"[the] " + property + " [of %" + fromType + "%]",
-						"%" + fromType + "%'[s] " + property
-				)
-				.build()
-		);
+				.addPatterns("[the] " + property + " [of %" + fromType + "%]",
+						"%" + fromType + "%'[s] " + property)
+				.build();
+		registry.register(SyntaxRegistry.EXPRESSION, info);
+		return info;
 	}
 
 	/**

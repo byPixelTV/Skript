@@ -79,21 +79,26 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 
 	/**
 	 * Registers an event value expression with the provided pattern.
+	 * The syntax info will be forced to use the {@link #DEFAULT_PRIORITY} priority.
 	 * This also adds '[the]' to the start of the pattern.
 	 *
-	 * @param registry the SyntaxRegistry to register this PropertyExpression with.
-	 * @param expressionClass The class that represents this EventValueExpression.
-	 * @param type The return type of the expression.
-	 * @param pattern The pattern for this syntax.
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param expressionClass The EventValueExpression class being registered.
+	 * @param returnType The class representing the expression's return type.
+	 * @param pattern The pattern to match for creating this expression.
+	 * @param <T> The return type.
+	 * @param <E> The Expression type.
+	 * @return The registered {@link SyntaxInfo}.
 	 */
 	@ApiStatus.Experimental
-	public static <T> void register(SyntaxRegistry registry, Class<? extends EventValueExpression<T>> expressionClass, Class<T> type, String pattern) {
-		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(expressionClass)
-				.returnType(type)
+	public static <E extends EventValueExpression<T>, T> SyntaxInfo.Expression<E, T> register(SyntaxRegistry registry, Class<E> expressionClass, Class<T> returnType, String pattern) {
+		SyntaxInfo.Expression<E, T> info = SyntaxInfo.Expression.builder(expressionClass)
+				.returnType(returnType)
 				.priority(DEFAULT_PRIORITY)
 				.addPattern("[the] " + pattern)
-				.build()
-		);
+				.build();
+		registry.register(SyntaxRegistry.EXPRESSION, info);
+		return info;
 	}
 
 	/**

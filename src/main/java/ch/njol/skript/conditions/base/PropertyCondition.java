@@ -96,57 +96,45 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 	}
 
 	/**
-	 * @param registry the SyntaxRegistry to register this PropertyCondition with.
-	 * @param condition the class to register
-	 * @param property the property name, for example <i>fly</i> in <i>players can fly</i>
-	 * @param type must be plural, for example <i>players</i> in <i>players can fly</i>
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param condition The class to register
+	 * @param property The property name, for example <i>fly</i> in <i>players can fly</i>
+	 * @param type Must be plural, for example <i>players</i> in <i>players can fly</i>
+	 * @param <E> The Condition type.
+	 * @return The registered {@link SyntaxInfo}.
 	 */
 	@ApiStatus.Experimental
-	public static void register(SyntaxRegistry registry, Class<? extends Condition> condition, String property, String type) {
-		register(registry, condition, PropertyType.BE, property, type);
+	public static <E extends Condition> SyntaxInfo<E> register(SyntaxRegistry registry, Class<E> condition, String property, String type) {
+		return register(registry, condition, PropertyType.BE, property, type);
 	}
 
 	/**
-	 * @param registry the SyntaxRegistry to register this PropertyCondition with.
-	 * @param condition the class to register
-	 * @param propertyType the property type, see {@link PropertyType}
-	 * @param property the property name, for example <i>fly</i> in <i>players can fly</i>
-	 * @param type must be plural, for example <i>players</i> in <i>players can fly</i>
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param condition The class to register
+	 * @param propertyType The property type, see {@link PropertyType}
+	 * @param property The property name, for example <i>fly</i> in <i>players can fly</i>
+	 * @param type Must be plural, for example <i>players</i> in <i>players can fly</i>
+	 * @param <E> The Condition type.
+	 * @return The registered {@link SyntaxInfo}.
 	 */
 	@ApiStatus.Experimental
-	public static void register(SyntaxRegistry registry, Class<? extends Condition> condition, PropertyType propertyType, String property, String type) {
+	public static <E extends Condition> SyntaxInfo<E> register(SyntaxRegistry registry, Class<E> condition, PropertyType propertyType, String property, String type) {
 		if (type.contains("%"))
 			throw new SkriptAPIException("The type argument must not contain any '%'s");
-		SyntaxInfo.Builder<?, ? extends Condition> builder = SyntaxInfo.builder(condition).priority(DEFAULT_PRIORITY);
+		SyntaxInfo.Builder<?, E> builder = SyntaxInfo.builder(condition).priority(DEFAULT_PRIORITY);
 		switch (propertyType) {
-			case BE:
-				builder.addPatterns(
-					"%" + type + "% (is|are) " + property,
-					"%" + type + "% (isn't|is not|aren't|are not) " + property
-				);
-				break;
-			case CAN:
-				builder.addPatterns(
-					"%" + type + "% can " + property,
-					"%" + type + "% (can't|cannot|can not) " + property
-				);
-				break;
-			case HAVE:
-				builder.addPatterns(
-					"%" + type + "% (has|have) " + property,
-					"%" + type + "% (doesn't|does not|do not|don't) have " + property
-				);
-				break;
-			case WILL:
-				builder.addPatterns(
-					"%" + type + "% will " + property,
-					"%" + type + "% (will (not|neither)|won't) " + property
-				);
-				break;
-			default:
-				assert false;
+			case BE -> builder.addPatterns("%" + type + "% (is|are) " + property,
+					"%" + type + "% (isn't|is not|aren't|are not) " + property);
+			case CAN -> builder.addPatterns("%" + type + "% can " + property,
+					"%" + type + "% (can't|cannot|can not) " + property);
+			case HAVE -> builder.addPatterns("%" + type + "% (has|have) " + property,
+					"%" + type + "% (doesn't|does not|do not|don't) have " + property);
+			case WILL -> builder.addPatterns("%" + type + "% will " + property,
+					"%" + type + "% (will (not|neither)|won't) " + property);
 		}
-		registry.register(SyntaxRegistry.CONDITION, builder.build());
+		SyntaxInfo<E> info = builder.build();
+		registry.register(SyntaxRegistry.CONDITION, info);
+		return info;
 	}
 
 	/**

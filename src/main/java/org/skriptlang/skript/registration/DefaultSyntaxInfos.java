@@ -1,12 +1,19 @@
 package org.skriptlang.skript.registration;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryValidator;
 import org.skriptlang.skript.registration.DefaultSyntaxInfosImpl.ExpressionImpl;
 import org.skriptlang.skript.registration.DefaultSyntaxInfosImpl.StructureImpl;
 
-interface DefaultSyntaxInfos {
+/**
+ * This class is not safe to be directly referenced.
+ * Use {@link SyntaxInfo} instead.
+ */
+@ApiStatus.Internal
+@ApiStatus.Experimental
+public interface DefaultSyntaxInfos {
 
 	/**
 	 * A syntax info to be used for {@link ch.njol.skript.lang.Expression}s.
@@ -14,6 +21,7 @@ interface DefaultSyntaxInfos {
 	 * @param <E> The class providing the implementation of the Expression this info represents.
 	 * @param <R> The type of the return type of the Expression.
 	 */
+	@ApiStatus.Experimental
 	interface Expression<E extends ch.njol.skript.lang.Expression<R>, R> extends SyntaxInfo<E> {
 
 		/**
@@ -66,6 +74,7 @@ interface DefaultSyntaxInfos {
 	 * It contains additional details including the {@link EntryValidator} to use, if any.
 	 * @param <E> The class providing the implementation of the Structure this info represents.
 	 */
+	@ApiStatus.Experimental
 	interface Structure<E extends org.skriptlang.skript.lang.structure.Structure> extends SyntaxInfo<E> {
 
 		/**
