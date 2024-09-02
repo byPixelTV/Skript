@@ -75,13 +75,13 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		 * also possibly in the negated form
 		 */
 		BE,
-		
+
 		/**
 		 * Indicates that the condition is in a form of <code>something can something</code>,
 		 * also possibly in the negated form
 		 */
 		CAN,
-		
+
 		/**
 		 * Indicates that the condition is in a form of <code>something has/have something</code>,
 		 * also possibly in the negated form
@@ -170,17 +170,17 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 
 		switch (propertyType) {
 			case BE:
-				Skript.registerCondition(condition,
+				Skript.registerCondition(condition, ConditionType.PROPERTY,
 						"%" + type + "% (is|are) " + property,
 						"%" + type + "% (isn't|is not|aren't|are not) " + property);
 				break;
 			case CAN:
-				Skript.registerCondition(condition,
+				Skript.registerCondition(condition, ConditionType.PROPERTY,
 						"%" + type + "% can " + property,
 						"%" + type + "% (can't|cannot|can not) " + property);
 				break;
 			case HAVE:
-				Skript.registerCondition(condition,
+				Skript.registerCondition(condition, ConditionType.PROPERTY,
 						"%" + type + "% (has|have) " + property,
 						"%" + type + "% (doesn't|does not|do not|don't) have " + property);
 				break;
@@ -197,9 +197,9 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 	private Expression<? extends T> expr;
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		expr = (Expression<? extends T>) expressions[0];
-
 		setNegated(matchedPattern == 1);
 		return true;
 	}
@@ -211,7 +211,7 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 
 	@Override
 	public abstract boolean check(T value);
-	
+
 	protected abstract String getPropertyName();
 
 	protected PropertyType getPropertyType() {
@@ -240,15 +240,17 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 			case CAN:
 				return expr.toString(event, debug) + (condition.isNegated() ? " can't " : " can ") + property;
 			case HAVE:
-				if (expr.isSingle())
+				if (expr.isSingle()) {
 					return expr.toString(event, debug) + (condition.isNegated() ? " doesn't have " : " has ") + property;
-				else
+				} else {
 					return expr.toString(event, debug) + (condition.isNegated() ? " don't have " : " have ") + property;
+				}
 			case WILL:
 				return expr.toString(event, debug) + (condition.isNegated() ? " won't " : " will ") + "be " + property;
 			default:
 				assert false;
-				throw new AssertionError();
+				return null;
 		}
 	}
+
 }
