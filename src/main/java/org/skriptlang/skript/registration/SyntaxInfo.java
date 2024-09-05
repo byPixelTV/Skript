@@ -79,7 +79,7 @@ public interface SyntaxInfo<E extends SyntaxElement> extends DefaultSyntaxInfos 
 	 * @param <B> The type of builder being used.
 	 * @param <E> The class providing the implementation of the syntax info being built.
 	 */
-	interface Builder<B extends Builder<B, E>, E extends SyntaxElement> {
+	interface Builder<B extends Builder<B, E>, E extends SyntaxElement> extends org.skriptlang.skript.util.Builder<Builder<?, ?>, SyntaxInfo<?>> {
 
 		/**
 		 * Sets the origin the syntax info will use.
@@ -140,6 +140,17 @@ public interface SyntaxInfo<E extends SyntaxElement> extends DefaultSyntaxInfos 
 		 */
 		@Contract("-> new")
 		SyntaxInfo<E> build();
+
+		/**
+		 * Applies the values of this builder onto <code>builder</code>.
+		 * When using this method, it is possible that <b>some values are not safe to copy over</b>.
+		 * For example, when applying a SyntaxInfo for some type to a SyntaxInfo of another type,
+		 * it is *not* safe to copy over {@link #supplier(Supplier)}, but that operation will occur anyway.
+		 * In cases like this, you are expected to correct the values.
+		 * @param builder The builder to apply values onto.
+		 */
+		@Override
+		void applyTo(Builder<?, ?> builder);
 
 	}
 

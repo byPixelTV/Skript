@@ -335,6 +335,27 @@ final class BukkitSyntaxInfosImpl {
 					since, documentationId, description, examples, keywords, requiredPlugins, events
 				);
 			}
+
+			@Override
+			public void applyTo(SyntaxInfo.Builder<?, ?> builder) {
+				defaultBuilder.applyTo(builder);
+				//noinspection rawtypes - Should be safe, generics will not influence this
+				if (builder instanceof Event.Builder eventBuilder) {
+					eventBuilder.listeningBehavior(listeningBehavior);
+					if (since != null) {
+						eventBuilder.since(since);
+					}
+					if (documentationId != null) {
+						eventBuilder.documentationId(documentationId);
+					}
+					eventBuilder.addDescription(description);
+					eventBuilder.addExamples(examples);
+					eventBuilder.addKeywords(keywords);
+					eventBuilder.addRequiredPlugins(requiredPlugins);
+					eventBuilder.addEvents(events);
+				}
+			}
+
 		}
 
 	}

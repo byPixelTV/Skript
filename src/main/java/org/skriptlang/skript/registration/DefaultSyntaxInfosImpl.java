@@ -81,6 +81,16 @@ final class DefaultSyntaxInfosImpl {
 				return new ExpressionImpl<>(origin, type, supplier, patterns, priority, returnType);
 			}
 
+			@Override
+			public void applyTo(SyntaxInfo.Builder<?, ?> builder) {
+				super.applyTo(builder);
+				//noinspection rawtypes - Might be unsafe, hopefully the return types match
+				if (builder instanceof Expression.Builder expressionBuilder) {
+					if (returnType != null) {
+						expressionBuilder.returnType(returnType);
+					}
+				}
+			}
 		}
 
 	}
@@ -171,6 +181,17 @@ final class DefaultSyntaxInfosImpl {
 				return new StructureImpl<>(origin, type, supplier, patterns, priority, entryValidator, nodeType);
 			}
 
+			@Override
+			public void applyTo(SyntaxInfo.Builder<?, ?> builder) {
+				super.applyTo(builder);
+				//noinspection rawtypes - Should be safe, generics will not influence this
+				if (builder instanceof Structure.Builder structureBuilder) {
+					if (entryValidator != null) {
+						structureBuilder.entryValidator(entryValidator);
+						structureBuilder.nodeType(nodeType);
+					}
+				}
+			}
 		}
 
 	}

@@ -164,6 +164,17 @@ class SyntaxInfoImpl<T extends SyntaxElement> implements SyntaxInfo<T> {
 			return new SyntaxInfoImpl<>(origin, type, supplier, patterns, priority);
 		}
 
+		@Override
+		public void applyTo(Builder<?, ?> builder) {
+			builder.origin(origin);
+			if (supplier != null) {
+				//noinspection rawtypes - Let's hope the user knows what they are doing...
+				builder.supplier((Supplier) supplier);
+			}
+			builder.addPatterns(patterns);
+			builder.priority(priority);
+		}
+
 	}
 
 }
