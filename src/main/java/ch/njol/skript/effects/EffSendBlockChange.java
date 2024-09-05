@@ -60,7 +60,7 @@ public class EffSendBlockChange extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		players = (Expression<Player>) exprs[0];
 		blocks = (Expression<Block>) exprs[1];
-		if (matchedPattern == 1)
+		if (matchedPattern == 0)
 			as = (Expression<Object>) exprs[2];
 		return true;
 	}
