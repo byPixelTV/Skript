@@ -52,7 +52,7 @@ public class ExprChatRecipients extends SimpleExpression<CommandSender> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!(getParser().isCurrentEvent(AsyncPlayerChatEvent.class, BroadcastMessageEvent.class))) {
-			Skript.error("Cannot use chat recipients expression outside of a chat or server broadcast event");
+			Skript.error("Cannot use chat recipients expression outside of a chat or a server broadcast event");
 			return false;
 		}
 		return true;
