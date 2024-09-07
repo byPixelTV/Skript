@@ -46,7 +46,7 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprChatRecipients extends SimpleExpression<CommandSender> {
 
 	static {
-		Skript.registerExpression(ExprChatRecipients.class, CommandSender.class, ExpressionType.SIMPLE, "[chat][( |-)]recipients");
+		Skript.registerExpression(ExprChatRecipients.class, CommandSender.class, ExpressionType.SIMPLE, "[chat( |-)]recipients");
 	}
 
 	@Override
