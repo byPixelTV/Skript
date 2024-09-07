@@ -61,10 +61,10 @@ public class ExprChatRecipients extends SimpleExpression<CommandSender> {
 	@Override
 	@Nullable
 	protected CommandSender[] get(Event event) {
-		if (event instanceof AsyncPlayerChatEvent) {
-			return ((AsyncPlayerChatEvent) event).getRecipients().toArray(new Player[0]);
-		} else if (event instanceof BroadcastMessageEvent) {
-			return ((BroadcastMessageEvent) event).getRecipients().toArray(new CommandSender[0]);
+		if (event instanceof AsyncPlayerChatEvent async) {
+			return async.getRecipients().toArray(new Player[0]);
+		} else if (event instanceof BroadcastMessageEvent broadcast) {
+			return broadcast.getRecipients().toArray(new CommandSender[0]);
 		}
 		return null;
 	}
