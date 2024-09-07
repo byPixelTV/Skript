@@ -754,7 +754,7 @@ public class SimpleEvents {
 							"\t\tsend \"You can't drag your items here!\" to player",
 							"\t\tcancel event"
 				)
-				.since("INSERT VERSION");
+				.since("2.7");
 
 		Skript.registerEvent("Server Broadcast", SimpleEvent.class, BroadcastMessageEvent.class, "[server] broadcast")
 				.description("Called when the server broadcasts messages. Does not get called when using Skript's <a href='effects.html#EffBroadcast'>broadcast</a> effect.")
@@ -763,7 +763,7 @@ public class SimpleEvents {
 							"\tbroadcast-message contains \"example\"",
 							"\tcancel event"
 				)
-				.since("2.7");
+				.since("INSERT VERSION");
 
 		{
 			final Class<? extends Event> eventClass;
