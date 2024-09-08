@@ -47,28 +47,30 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Message")
 @Description("The (chat) message of a chat event, the join message of a join event, the quit message of a quit event, or the death message on a death event. This expression is mostly useful for being changed.")
 @Examples({
-	"on chat:",
-		"\tplayer has permission \"admin\"",
-		"\tset message to \"&c%message%\"",
-	"",
-	"on first join:",
-		"\tset join message to \"Welcome %player% to our awesome server!\"",
-	"",
-	"on join:",
-		"\tplayer has played before",
-		"\tset join message to \"Welcome back, %player%!\"",
-	"",
-	"on quit:",
-		"\tset quit message to \"%player% left this awesome server!\"",
-	"",
-	"on death:",
-		"\tset the death message to \"%player% died!\"",
-	"",
-	"on server broadcast:",
-		"\tset the broadcast message to \"something else!\""
-})
-@Since("1.4.6 (chat message), 1.4.9 (join & quit messages), 2.0 (death message), INSERT VERSION (broadcast message)")
-@Events({"chat", "join", "quit", "death", "server_broadcast"})
+		"on chat:",
+			"\tplayer has permission \"admin\"",
+			"\tset message to \"&c%message%\"",
+		"",
+		"on first join:",
+			"\tset join message to \"Welcome %player% to our awesome server!\"",
+		"",
+		"on join:",
+			"\tplayer has played before",
+			"\tset join message to \"Welcome back, %player%!\"",
+		"",
+		"on quit:",
+			"\tif {vanish::%player's uuid%} is set:",
+				"\t\tclear quit message",
+			"\telse:",
+				"\t\tset quit message to \"%player% left this awesome server!\"",
+		"",
+		"on server broadcast:",
+			"\tset the broadcast message to \"something else!\""
+		"",
+		"on death:",
+			"\tset the death message to \"%player% died!\""})
+@Since("1.4.6 (chat message), 1.4.9 (join & quit messages), 2.0 (death message), 2.9.0 (clear message), INSERT VERSION (broadcast message)")
+@Events({"chat", "join", "quit", "death"})
 public class ExprMessage extends SimpleExpression<String> {
 
 	@SuppressWarnings("unchecked")
@@ -194,7 +196,7 @@ public class ExprMessage extends SimpleExpression<String> {
 	@Override
 	@Nullable
 	public Class<?>[] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET)
+		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
 			return CollectionUtils.array(String.class);
 		return null;
 	}
@@ -205,7 +207,7 @@ public class ExprMessage extends SimpleExpression<String> {
 		assert delta != null;
 		for (Class<? extends Event> c : type.events) {
 			if (c.isInstance(event))
-				type.set(event, "" + delta[0]);
+				type.set(event, (mode == ChangeMode.DELETE || delta[0] == null) ? "" : delta[0].toString());
 		}
 	}
 
