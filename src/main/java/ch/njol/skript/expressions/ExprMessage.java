@@ -65,7 +65,7 @@ import ch.njol.util.coll.CollectionUtils;
 				"\t\tset quit message to \"%player% left this awesome server!\"",
 		"",
 		"on server broadcast:",
-			"\tset the broadcast message to \"something else!\""
+			"\tset the broadcast message to \"something else!\"",
 		"",
 		"on death:",
 			"\tset the death message to \"%player% died!\""})
