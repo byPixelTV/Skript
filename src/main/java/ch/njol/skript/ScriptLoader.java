@@ -46,7 +46,7 @@ import ch.njol.util.OpenCloseable;
 import ch.njol.util.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.structure.Structure;
 
@@ -964,7 +964,7 @@ public class ScriptLoader {
 
 			if (subNode instanceof SimpleNode) {
 				long start = System.currentTimeMillis();
-				Statement stmt = Statement.parse(expr, "Can't understand this condition/effect: " + expr);
+				Statement stmt = Statement.parse(expr, items, "Can't understand this condition/effect: " + expr);
 				if (stmt == null)
 					continue;
 				long requiredTime = SkriptConfig.longParseTimeWarningThreshold.value().getMilliSeconds();
