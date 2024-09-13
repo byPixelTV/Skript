@@ -33,7 +33,7 @@ import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
@@ -104,7 +104,7 @@ public class EvtBlock extends SkriptEvent {
 		if (event instanceof BlockFormEvent) {
 			BlockFormEvent blockFormEvent = (BlockFormEvent) event;
 			BlockState newState = blockFormEvent.getNewState();
-			item = new ItemType(newState);
+			item = new ItemType(newState.getBlockData());
 			blockData = newState.getBlockData();
 		} else if (event instanceof BlockEvent) {
 			BlockEvent blockEvent = (BlockEvent) event;
