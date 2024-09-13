@@ -20,7 +20,7 @@ package ch.njol.skript.expressions;
 
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -52,7 +52,8 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	
 	static {
-		register(ExprVectorXYZ.class, Number.class, "[vector] (0¦x|1¦y|2¦z) [component[s]]", "vectors");
+		// TODO: Combine with ExprCoordinates for 2.9
+		register(ExprVectorXYZ.class, Number.class, "[vector] (0:x|1:y|2:z) [component[s]]", "vectors");
 	}
 	
 	private final static Character[] axes = new Character[] {'x', 'y', 'z'};
@@ -84,6 +85,8 @@ public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		assert delta != null;
 		Vector[] vectors = getExpr().getArray(event);
+		if (vectors.length == 0)
+			return;
 		double deltaValue = ((Number) delta[0]).doubleValue();
 		switch (mode) {
 			case REMOVE:

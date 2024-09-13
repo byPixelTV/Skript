@@ -31,7 +31,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.comparator.Relation;
 
 import ch.njol.skript.Skript;
@@ -56,11 +56,6 @@ public class EvtClick extends SkriptEvent {
 	 * Tracks PlayerInteractEvents to deduplicate them.
 	 */
 	public static final ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
-
-	/**
-	 * Tracks PlayerInteractEntityEvents to deduplicate them.
-	 */
-	private static final ClickEventTracker entityInteractTracker = new ClickEventTracker(Skript.getInstance());
 
 	static {
 		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(
@@ -147,7 +142,7 @@ public class EvtClick extends SkriptEvent {
 			
 			// PlayerInteractAtEntityEvent called only once for armor stands
 			if (!(event instanceof PlayerInteractAtEntityEvent)) {
-				if (!entityInteractTracker.checkEvent(clickEvent.getPlayer(), clickEvent, clickEvent.getHand())) {
+				if (!interactTracker.checkEvent(clickEvent.getPlayer(), clickEvent, clickEvent.getHand())) {
 					return false; // Not first event this tick
 				}
 			}

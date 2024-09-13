@@ -25,6 +25,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SectionExitHandler;
 import ch.njol.skript.lang.LoopSection;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
@@ -34,7 +35,7 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.sections.SecConditional;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -122,8 +123,8 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 				assert false : this;
 				return null;
 			}
-			if (node instanceof LoopSection)
-				((LoopSection) node).exit(event);
+			if (node instanceof SectionExitHandler)
+				((SectionExitHandler) node).exit(event);
 
 			if (type == EVERYTHING || type == CONDITIONALS && node instanceof SecConditional || type == LOOPS && (node instanceof LoopSection))
 				i--;
