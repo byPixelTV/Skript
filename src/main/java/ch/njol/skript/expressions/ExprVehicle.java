@@ -171,12 +171,12 @@ public class ExprVehicle extends PropertyExpression<Entity, Entity> {
 			if (passenger == null)
 				return;
 			Object object = delta[0];
-			if (object instanceof Entity) {
-				((Entity) object).eject();
+			if (object instanceof Entity entity) {
+				entity.eject();
 				passenger.leaveVehicle();
-				((Entity) object).addPassenger(passenger);
-			} else if (object instanceof EntityData) {
-				Entity vehicle = ((EntityData<?>) object).spawn(passenger.getLocation());
+				entity.addPassenger(passenger);
+			} else if (object instanceof EntityData entityData) {
+				Entity vehicle = entityData.spawn(passenger.getLocation());
 				if (vehicle == null)
 					return;
 				vehicle.addPassenger(vehicle);

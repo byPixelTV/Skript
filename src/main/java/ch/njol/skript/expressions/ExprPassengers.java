@@ -176,8 +176,8 @@ public class ExprPassengers extends PropertyExpression<Entity, Entity> {
 			case REMOVE:
 				for (Object object : delta) {
 					for (Entity vehicle : vehicles) {
-						if (object instanceof Entity) {
-							vehicle.removePassenger((Entity) object);
+						if (object instanceof Entity passenger) {
+							vehicle.removePassenger(passenger);
 						} else {
 							for (Entity passenger : vehicle.getPassengers()) {
 								if (passenger != null && ((EntityData<?>) object).isInstance((passenger)))

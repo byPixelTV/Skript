@@ -87,8 +87,7 @@ public class EffVehicle extends Effect {
 		if (passengers.length == 0)
 			return;
 		for (Object object : vehicles) {
-			if (object instanceof Entity) {
-				Entity vehicle = (Entity) object;
+			if (object instanceof Entity vehicle) {
 				vehicle.eject();
 				for (Entity passenger : passengers) {
 					passenger.leaveVehicle();
