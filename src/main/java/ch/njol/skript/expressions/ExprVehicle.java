@@ -20,7 +20,13 @@ package ch.njol.skript.expressions;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
+<<<<<<< HEAD
 import org.bukkit.event.entity.EntityEvent;
+=======
+import org.bukkit.event.entity.EntityDismountEvent;
+import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.entity.EntityMountEvent;
+>>>>>>> 72a8496474497e778320f9f6ce891522449bfa0c
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +50,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-@SuppressWarnings("unchecked")
 @Name("Vehicle")
 @Description({"The vehicle an entity is in, if any. This can actually be any entity, e.g. spider jockeys are skeletons that ride on a spider, so the spider is the 'vehicle' of the skeleton.",
 		"See also: <a href='#ExprPassenger'>passenger</a>"})
@@ -103,6 +108,7 @@ public class ExprVehicle extends PropertyExpression<Entity, Entity> {
 	private boolean plural;
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		setExpr((Expression<Entity>) exprs[0]);
 		plural = parseResult.hasTag("s");
@@ -192,6 +198,7 @@ public class ExprVehicle extends PropertyExpression<Entity, Entity> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean setTime(int time) {
 		if (time == EventValues.TIME_PAST) {
 			if (HAS_OLD_MOUNT_EVENTS)
