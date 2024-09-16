@@ -10,7 +10,7 @@ test "has passengers":
 	eject any passengers from {_pig}
 	make {_pig} ride on {_cow}
 	assert {_cow} has a passenger with "The cow did not have any passengers"
-	assert vehicle of {_cow} is {_pig} with "The cow did not have the pig as a passenger"
+	assert vehicle of {_pig} is {_cow} with "The cow did not have the pig as a passenger"
 	clear entity within {_pig}
 	assert {_pig} is not valid with "The pig is not dead"
 

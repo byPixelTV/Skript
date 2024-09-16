@@ -22,13 +22,14 @@ import java.util.Arrays;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityDismountEvent;
+import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
-import org.spigotmc.event.entity.EntityDismountEvent;
-import org.spigotmc.event.entity.EntityMountEvent;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -42,22 +43,25 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-@Name("Passengers")
-@Description({
-	"The passengers of a vehicle, or the riders of a mob.",
-	"You can use all changers in it.",
-	"See also: <a href='#ExprVehicle'>vehicle</a>"
-})
-@Examples({
-	"passengers of the minecart contains a creeper or a cow",
-	"the boat's passenger contains a pig",
-	"add a cow and a zombie to passengers of last spawned boat",
-	"set passengers of player's vehicle to a pig and a horse",
-	"remove all pigs from player's vehicle",
-	"clear passengers of boat"
-})
-@Since("2.0, 2.2-dev26 (multiple passengers)")
+@Name("Passenger")
+@Description({"The passenger of a vehicle, or the rider of a mob.",
+		"For 1.11.2 and above, it returns a list of passengers and you can use all changers in it.",
+		"See also: <a href='#ExprVehicle'>vehicle</a>"})
+@Examples({"#for 1.11 and lower",
+		"passenger of the minecart is a creeper or a cow",
+		"the saddled pig's passenger is a player",
+		"#for 1.11.2+",
+		"passengers of the minecart contains a creeper or a cow",
+		"the boat's passenger contains a pig",
+		"add a cow and a zombie to passengers of last spawned boat",
+		"set passengers of player's vehicle to a pig and a horse",
+		"remove all pigs from player's vehicle",
+		"clear passengers of boat"})
+@Since("2.0, 2.2-dev26 (Multiple passengers for 1.11.2+)")
 public class ExprPassengers extends PropertyExpression<Entity, Entity> {
+
+	// In 1.20 Spigot moved this event from the package org.spigotmc.event to org.bukkit.event
+	private static final boolean HAS_NEW_MOUNT_EVENTS = Skript.classExists("org.bukkit.event.entity.EntityMountEvent");
 
 	static {
 		registerDefault(ExprPassengers.class, Entity.class, "passenger[:s]", "entities");
@@ -76,14 +80,16 @@ public class ExprPassengers extends PropertyExpression<Entity, Entity> {
 	@Override
 	protected Entity[] get(Event event, Entity[] source) {
 		Converter<Entity, Entity[]> converter = entity -> {
-			if (getTime() != EventValues.TIME_PAST && event instanceof VehicleEnterEvent && entity.equals(((VehicleEnterEvent) event).getVehicle()))
-				return new Entity[] {((VehicleEnterEvent) event).getEntered()};
-			if (getTime() != EventValues.TIME_FUTURE && event instanceof VehicleExitEvent && entity.equals(((VehicleExitEvent) event).getVehicle()))
-				return new Entity[] {((VehicleExitEvent) event).getExited()};
-			if (getTime() != EventValues.TIME_PAST && event instanceof EntityMountEvent && entity.equals(((EntityMountEvent) event).getEntity()))
-				return new Entity[] {((EntityMountEvent) event).getEntity()};
-			if (getTime() != EventValues.TIME_FUTURE && event instanceof EntityDismountEvent && entity.equals(((EntityDismountEvent) event).getEntity()))
-				return new Entity[] {((EntityDismountEvent) event).getEntity()};
+			if (getTime() != EventValues.TIME_PAST && event instanceof VehicleEnterEvent vehicleEnterEvent && entity.equals(vehicleEnterEvent.getVehicle()))
+				return new Entity[] {vehicleEnterEvent.getEntered()};
+			if (getTime() != EventValues.TIME_FUTURE && event instanceof VehicleExitEvent vehicleExitEvent && entity.equals(vehicleExitEvent.getVehicle()))
+				return new Entity[] {vehicleExitEvent.getExited()};
+			if (HAS_NEW_MOUNT_EVENTS) {
+				if (getTime() != EventValues.TIME_PAST && event instanceof org.bukkit.event.entity.EntityMountEvent entityMountEvent && entity.equals(entityMountEvent.getEntity()))
+					return new Entity[] {entityMountEvent.getEntity()};
+				if (getTime() != EventValues.TIME_FUTURE && event instanceof org.bukkit.event.entity.EntityDismountEvent entityDismountEvent && entity.equals(entityDismountEvent.getEntity()))
+					return new Entity[] {entityDismountEvent.getEntity()};
+			}
 			return entity.getPassengers().toArray(new Entity[0]);
 		};
 		return Arrays.stream(source)
