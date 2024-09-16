@@ -20,13 +20,7 @@ package ch.njol.skript.expressions;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
-<<<<<<< HEAD
 import org.bukkit.event.entity.EntityEvent;
-=======
-import org.bukkit.event.entity.EntityDismountEvent;
-import org.bukkit.event.entity.EntityEvent;
-import org.bukkit.event.entity.EntityMountEvent;
->>>>>>> 72a8496474497e778320f9f6ce891522449bfa0c
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.jetbrains.annotations.Nullable;
