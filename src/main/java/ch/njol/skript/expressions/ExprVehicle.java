@@ -114,10 +114,10 @@ public class ExprVehicle extends PropertyExpression<Entity, Entity> {
 	@Override
 	protected Entity[] get(Event event, Entity[] source) {
 		return get(source, entity -> {
-			if (getTime() != EventValues.TIME_PAST && event instanceof org.bukkit.event.entity.EntityMountEvent entityMountEvent && entity.equals(entityMountEvent.getEntity()))
-				return entityMountEvent.getMount();
-			if (getTime() != EventValues.TIME_FUTURE && event instanceof org.bukkit.event.entity.EntityDismountEvent entityDismountEvent && entity.equals(entityDismountEvent.getEntity()))
-				return entityDismountEvent.getDismounted();
+			if (getTime() >= 0 && event instanceof VehicleEnterEvent vehicleEnterEvent && entity.equals(vehicleEnterEvent.getEntered()))
+				return vehicleEnterEvent.getVehicle();
+			if (getTime() >= 0 && event instanceof VehicleExitEvent vehicleExitEvent && entity.equals(vehicleExitEvent.getExited()))
+				return vehicleExitEvent.getVehicle();
 			if (
 				(HAS_OLD_MOUNT_EVENTS || HAS_NEW_MOUNT_EVENTS)
 				&& getTime() >= 0 && !Delay.isDelayed(event)
