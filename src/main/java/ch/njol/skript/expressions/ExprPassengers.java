@@ -18,6 +18,9 @@
  */
 package ch.njol.skript.expressions;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Arrays;
 
 import org.bukkit.entity.Entity;
@@ -60,11 +63,52 @@ import ch.njol.util.coll.CollectionUtils;
 @Since("2.0, 2.2-dev26 (Multiple passengers for 1.11.2+)")
 public class ExprPassengers extends PropertyExpression<Entity, Entity> {
 
-	// In 1.20 Spigot moved this event from the package org.spigotmc.event to org.bukkit.event
 	private static final boolean HAS_NEW_MOUNT_EVENTS = Skript.classExists("org.bukkit.event.entity.EntityMountEvent");
+
+	private static final boolean HAS_OLD_MOUNT_EVENTS;
+	@Nullable
+	private static final Class<?> OLD_MOUNT_EVENT_CLASS;
+	@Nullable
+	private static final MethodHandle OLD_GETMOUNT_HANDLE;
+	@Nullable
+	private static final Class<?> OLD_DISMOUNT_EVENT_CLASS;
+	@Nullable
+	private static final MethodHandle OLD_GETDISMOUNTED_HANDLE;
 
 	static {
 		registerDefault(ExprPassengers.class, Entity.class, "passenger[:s]", "entities");
+
+		// legacy support. In 1.20 spigot moved this event from the package org.spigotmc.event to org.bukkit.event
+		boolean hasOldMountEvents = !HAS_NEW_MOUNT_EVENTS &&
+				Skript.classExists("org.spigotmc.event.entity.EntityMountEvent");
+		Class<? extends Event> oldMountEventClass = null;
+		MethodHandle oldGetMountHandle = null;
+		Class<? extends Event> oldDismountEventClass = null;
+		MethodHandle oldGetDismountedHandle = null;
+		if (hasOldMountEvents) {
+			try {
+				MethodHandles.Lookup lookup = MethodHandles.lookup();
+				MethodType entityReturnType = MethodType.methodType(Entity.class);
+				// mount event
+				oldMountEventClass = (Class<? extends Event>) Class.forName("org.spigotmc.event.entity.EntityMountEvent");
+				oldGetMountHandle = lookup.findVirtual(oldMountEventClass, "getMount", entityReturnType);
+				// dismount event
+				oldDismountEventClass = (Class<? extends Event>) Class.forName("org.spigotmc.event.entity.EntityDismountEvent");
+				oldGetDismountedHandle = lookup.findVirtual(oldDismountEventClass, "getDismounted", entityReturnType);
+			} catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {
+				hasOldMountEvents = false;
+				oldMountEventClass = null;
+				oldGetMountHandle = null;
+				oldDismountEventClass = null;
+				oldGetDismountedHandle = null;
+				Skript.exception(e, "Failed to load old mount event support.");
+			}
+		}
+		HAS_OLD_MOUNT_EVENTS = hasOldMountEvents;
+		OLD_MOUNT_EVENT_CLASS = oldMountEventClass;
+		OLD_GETMOUNT_HANDLE = oldGetMountHandle;
+		OLD_DISMOUNT_EVENT_CLASS = oldDismountEventClass;
+		OLD_GETDISMOUNTED_HANDLE = oldGetDismountedHandle;
 	}
 
 	private boolean plural;
@@ -161,12 +205,21 @@ public class ExprPassengers extends PropertyExpression<Entity, Entity> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean setTime(int time) {
-		if (time == EventValues.TIME_PAST)
-			super.setTime(time, getExpr(), EntityDismountEvent.class, VehicleExitEvent.class);
-		if (time == EventValues.TIME_FUTURE)
-			return super.setTime(time, getExpr(), EntityMountEvent.class, VehicleEnterEvent.class);
-		return super.setTime(time, getExpr(), EntityDismountEvent.class, VehicleExitEvent.class, EntityMountEvent.class, VehicleEnterEvent.class);
+		if (time == EventValues.TIME_PAST) {
+			if (HAS_OLD_MOUNT_EVENTS)
+				return super.setTime(time, getExpr(), (Class<? extends Event>[]) CollectionUtils.array(OLD_DISMOUNT_EVENT_CLASS, VehicleExitEvent.class));
+			super.setTime(time, getExpr(), org.bukkit.event.entity.EntityDismountEvent.class, VehicleExitEvent.class);
+		}
+		if (time == EventValues.TIME_FUTURE) {
+			if (HAS_OLD_MOUNT_EVENTS)
+				return super.setTime(time, getExpr(), (Class<? extends Event>[]) CollectionUtils.array(OLD_MOUNT_EVENT_CLASS, VehicleEnterEvent.class));
+			return super.setTime(time, getExpr(), org.bukkit.event.entity.EntityMountEvent.class, VehicleEnterEvent.class);
+		}
+		if (HAS_OLD_MOUNT_EVENTS)
+			return super.setTime(time, getExpr(), (Class<? extends Event>[]) CollectionUtils.array(OLD_DISMOUNT_EVENT_CLASS, VehicleExitEvent.class, OLD_MOUNT_EVENT_CLASS, VehicleEnterEvent.class));
+		return super.setTime(time, getExpr(), org.bukkit.event.entity.EntityDismountEvent.class, VehicleExitEvent.class, org.bukkit.event.entity.EntityMountEvent.class, VehicleEnterEvent.class);
 	}
 
 	@Override
