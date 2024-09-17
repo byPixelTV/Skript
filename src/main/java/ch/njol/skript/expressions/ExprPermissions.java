@@ -54,7 +54,7 @@ public class ExprPermissions extends PropertyExpression<Entity, String> {
 	static {
 		Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY,
 				"[all [[of] the]|the] permissions (from|of) %entities%",
-				"[all [of] the] %entities%'[s] permissions"
+				"%entities%'[s] permissions"
 		);
 	}
 
