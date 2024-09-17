@@ -19,13 +19,16 @@
 package ch.njol.skript.expressions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -109,7 +112,7 @@ public class ExprPermissions extends PropertyExpression<Entity, String> {
 			}
 			return;
 		}
-		for (Entity entity : getExpr().getAll(event)) {
+		for (Entity entity : getExpr().getArray(event)) {
 			PermissionAttachment attachment = getPermission(entity);
 			for (String permission : permissions)
 				attachment.setPermission(permission, true);
