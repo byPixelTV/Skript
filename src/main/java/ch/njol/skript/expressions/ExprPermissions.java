@@ -19,12 +19,9 @@
 package ch.njol.skript.expressions;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -72,50 +69,63 @@ public class ExprPermissions extends PropertyExpression<Entity, String> {
 	protected String[] get(Event event, Entity[] source) {
 		return getExpr().stream(event)
 				.flatMap(permissible -> permissible.getEffectivePermissions().stream())
-				.map(permission -> permission.getPermission())
+				.map(PermissionAttachmentInfo::getPermission)
 				.toArray(String[]::new);
 	}
 
 	@Override
 	public Class<?>[] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.ADD || mode == ChangeMode.REMOVE || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(String[].class);
-		return null;
+		switch (mode) {
+			case ADD:
+			case REMOVE:
+				return CollectionUtils.array(String[].class);
+			case DELETE:
+				return CollectionUtils.array();
+			default:
+				return null;
+		}
 	}
 
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		List<String> permissions = new ArrayList<>();
 		if (mode != ChangeMode.DELETE) {
-			if (delta == null)
-				return;
+			assert delta != null;
 			for (Object permission : delta) {
 				if (permission == null)
 					continue;
 				permissions.add((String) permission);
 			}
 		}
-		if (mode == ChangeMode.DELETE || mode == ChangeMode.REMOVE) {
-			for (Entity entity : getExpr().getArray(event)) {
-				for (PermissionAttachmentInfo info : entity.getEffectivePermissions()) {
-					PermissionAttachment attachment = info.getAttachment();
-					if (attachment == null)
-						continue;
-					for (String permission : attachment.getPermissions().keySet()) {
-						if (mode == ChangeMode.DELETE) {
-							attachment.unsetPermission(permission);
-						} else if (permissions.contains(permission)) {
-							attachment.unsetPermission(permission);
+
+		switch (mode) {
+			case DELETE:
+			case REMOVE:
+				for (Entity entity : getExpr().getArray(event)) {
+					for (PermissionAttachmentInfo info : entity.getEffectivePermissions()) {
+						PermissionAttachment attachment = info.getAttachment();
+						if (attachment == null)
+							continue;
+						for (String permission : attachment.getPermissions().keySet()) {
+							if (mode == ChangeMode.DELETE) {
+								attachment.unsetPermission(permission);
+							} else if (permissions.contains(permission)) {
+								attachment.unsetPermission(permission);
+							}
 						}
 					}
 				}
-			}
-			return;
-		}
-		for (Entity entity : getExpr().getArray(event)) {
-			PermissionAttachment attachment = getPermission(entity);
-			for (String permission : permissions)
-				attachment.setPermission(permission, true);
+				break;
+			case ADD:
+				for (Entity entity : getExpr().getArray(event)) {
+					PermissionAttachment attachment = getPermission(entity);
+					for (String permission : permissions) {
+						attachment.setPermission(permission, true);
+					}
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
