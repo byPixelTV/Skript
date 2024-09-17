@@ -141,9 +141,7 @@ public class ExprPermissions extends PropertyExpression<Entity, String> {
 		Skript instance = Skript.getInstance();
 		for (PermissionAttachmentInfo info : entity.getEffectivePermissions()) {
 			PermissionAttachment attachment = info.getAttachment();
-			if (attachment == null)
-				continue;
-			if (attachment.getPlugin().equals(instance))
+			if (attachment != null && attachment.getPlugin().equals(instance))
 				return attachment;
 		}
 		return entity.addAttachment(instance);
