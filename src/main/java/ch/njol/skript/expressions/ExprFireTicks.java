@@ -28,7 +28,7 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Fire Burn Duration")
 @Description("How much time an entity will be burning for.")
@@ -43,7 +43,7 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	@Override
 	@Nullable
 	public Timespan convert(Entity entity) {
-		return Timespan.fromTicks_i(Math.max(entity.getFireTicks(), 0));
+		return Timespan.fromTicks(Math.max(entity.getFireTicks(), 0));
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		Entity[] entities = getExpr().getArray(event);
-		int change = delta == null ? 0 : (int) ((Timespan) delta[0]).getTicks_i();
+		int change = delta == null ? 0 : (int) ((Timespan) delta[0]).getTicks();
 		switch (mode) {
 			case REMOVE:
 				change = -change;

@@ -26,7 +26,7 @@ import ch.njol.skript.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.md_5.bungee.api.ChatColor;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -538,6 +538,8 @@ public class ChatMessages {
 			to.insertion = from.insertion;
 		if (to.hoverEvent == null)
 			to.hoverEvent = from.hoverEvent;
+		if (to.font == null)
+			to.font = from.font;
 	}
 
 	public static void shareStyles(MessageComponent[] components) {
@@ -591,6 +593,10 @@ public class ChatMessages {
 			List<MessageComponent> components = parse(result);
 			StringBuilder builder = new StringBuilder();
 			for (MessageComponent component : components) { // This also strips bracket tags ex. <red> <ttp:..> etc.
+				if (component.translation != null)
+					builder.append(component.translation);
+				if (component.keybind != null)
+					builder.append(component.keybind);
 				builder.append(component.text);
 			}
 			String plain = builder.toString();

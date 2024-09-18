@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -92,31 +92,24 @@ public class EffObjectives extends Effect  {
 	 * @return boolean true if the test passed.
 	 */
 	public static boolean isJUnitComplete() {
-		if (requirements.isEmpty())
-			return true;
-		if (completeness.isEmpty() && !requirements.isEmpty())
-			return false;
+		assert !completeness.isEmpty() || !requirements.isEmpty();
 		return completeness.equals(requirements);
 	}
 
 	/**
-	 * Returns an array string containing all the objectives that the current
-	 * JUnit test failed to accomplish in the given time.
-	 * 
-	 * @return
+	 * Fails the JUnit testing system if any JUnit tests did not complete their checks.
 	 */
-	public static String getFailedObjectivesString() {
-		StringBuilder builder = new StringBuilder();
+	public static void fail() {
 		for (String test : requirements.keySet()) {
 			if (!completeness.containsKey(test)) {
-				builder.append("JUnit test '" + test + "' didn't complete any objectives.");
+				TestTracker.JUnitTestFailed("JUnit: '" + test + "'", "didn't complete any objectives.");
 				continue;
 			}
 			List<String> failures = Lists.newArrayList(requirements.get(test));
 			failures.removeAll(completeness.get(test));
-			builder.append("JUnit test '" + test + "' failed objectives: " + Arrays.toString(failures.toArray(new String[0])));
+			if (!failures.isEmpty())
+				TestTracker.JUnitTestFailed("JUnit: '" + test + "'", "failed objectives: " + Arrays.toString(failures.toArray(new String[0])));
 		}
-		return builder.toString();
 	}
 
 }

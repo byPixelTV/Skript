@@ -18,7 +18,7 @@
  */
 package ch.njol.skript.util.chat;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.util.chat.MessageComponent.ClickEvent;
 import ch.njol.skript.util.chat.MessageComponent.HoverEvent;
@@ -162,6 +162,13 @@ public enum SkriptChatCode implements ChatCode {
 	    @Override
         public void updateComponent(MessageComponent component, String param) {
 			component.translation = param;
+		}
+    },
+
+    keybind(true) {
+	    @Override
+        public void updateComponent(MessageComponent component, String param) {
+			component.keybind = param;
 		}
     };
 

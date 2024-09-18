@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.google.common.collect.Queues;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -85,20 +86,33 @@ public class StructVariables extends Structure {
 
 	public static class DefaultVariables implements ScriptData {
 
-		private final Deque<Map<String, Class<?>[]>> hints = new ArrayDeque<>();
+		/*
+		 * Performance/Risk Notice:
+		 * In the event that an element is pushed to the deque on one thread, causing it to grow, a second thread
+		 *  waiting to access the dequeue may not see the correct deque or pointers (the backing array is not volatile),
+		 *  causing issues such as a loss of data or attempting to write beyond the array's capacity.
+		 * It is unlikely for the array to ever grow from its default capacity (16), as this would require extreme
+		 *  nesting of variables (e.g. {a::%{b::%{c::<and so on>}%}%} (given the current usage of enter/exit scope)
+		 * While thread-safe deque implementations are available, this setup has been chosen for performance.
+		 */
+		private final Deque<Map<String, Class<?>[]>> hints = Queues.synchronizedDeque(new ArrayDeque<>());
 		private final List<NonNullPair<String, Object>> variables;
+		private boolean loaded;
 
 		public DefaultVariables(Collection<NonNullPair<String, Object>> variables) {
 			this.variables = ImmutableList.copyOf(variables);
 		}
 
-		@SuppressWarnings("unchecked")
 		public void add(String variable, Class<?>... hints) {
-			if (hints == null || hints.length <= 0)
+			if (hints == null || hints.length == 0)
 				return;
-			if (CollectionUtils.containsAll(hints, Object.class)) // Ignore useless type hint
+			if (CollectionUtils.containsAll(hints, Object.class)) // Ignore useless type hint.
 				return;
-			this.hints.getFirst().put(variable, hints);
+			// This important empty check ensures that the variable type hint came from a defined DefaultVariable.
+			Map<String, Class<?>[]> map = this.hints.peekFirst();
+			if (map == null)
+				return;
+			map.put(variable, hints);
 		}
 
 		public void enterScope() {
@@ -112,16 +126,17 @@ public class StructVariables extends Structure {
 		/**
 		 * Returns the type hints of a variable.
 		 * Can be null if no type hint was saved.
-		 * 
+		 *
 		 * @param variable The variable string of a variable.
 		 * @return type hints of a variable if found otherwise null.
 		 */
-		@Nullable
-		public Class<?>[] get(String variable) {
-			for (Map<String, Class<?>[]> map : hints) {
-				Class<?>[] hints = map.get(variable);
-				if (hints != null && hints.length > 0)
-					return hints;
+		public Class<?> @Nullable [] get(String variable) {
+			synchronized (hints) { // must manually synchronize for iterators
+				for (Map<String, Class<?>[]> map : hints) {
+					Class<?>[] hints = map.get(variable);
+					if (hints != null && hints.length > 0)
+						return hints;
+				}
 			}
 			return null;
 		}
@@ -137,14 +152,25 @@ public class StructVariables extends Structure {
 		public List<NonNullPair<String, Object>> getVariables() {
 			return variables;
 		}
+		
+		private boolean isLoaded() {
+			return loaded;
+		}
 	}
 
 	@Override
-	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult, EntryContainer entryContainer) {
+	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult, @Nullable EntryContainer entryContainer) {
+		// noinspection ConstantConditions - entry container cannot be null as this structure is not simple
 		SectionNode node = entryContainer.getSource();
 		node.convertToEntries(0, "=");
-
-		List<NonNullPair<String, Object>> variables = new ArrayList<>();
+		List<NonNullPair<String, Object>> variables;
+		Script script = getParser().getCurrentScript();
+		DefaultVariables existing = script.getData(DefaultVariables.class); // if the user has TWO variables: sections
+		if (existing != null && existing.hasDefaultVariables()) {
+			variables = new ArrayList<>(existing.variables);
+		} else {
+			variables = new ArrayList<>();
+		}
 		for (Node n : node) {
 			if (!(n instanceof EntryNode)) {
 				Skript.error("Invalid line in variables structure");
@@ -152,8 +178,15 @@ public class StructVariables extends Structure {
 			}
 
 			String name = n.getKey().toLowerCase(Locale.ENGLISH);
-			if (name.startsWith("{") && name.endsWith("}"))
+			if (name.startsWith("{") && name.endsWith("}")) {
 				name = name.substring(1, name.length() - 1);
+			} else {
+				// TODO deprecated, remove this ability soon.
+				Skript.warning(
+						"It is suggested to use brackets around the name of a variable. Example: {example::%player%} = 5\n" +
+						"Excluding brackets is deprecated, meaning this warning will become an error in the future."
+				);
+			}
 
 			if (name.startsWith(Variable.LOCAL_VARIABLE_TOKEN)) {
 				Skript.error("'" + name + "' cannot be a local variable in default variables structure");
@@ -217,20 +250,26 @@ public class StructVariables extends Structure {
 			}
 			variables.add(new NonNullPair<>(name, o));
 		}
-		getParser().getCurrentScript().addData(new DefaultVariables(variables));
+		script.addData(new DefaultVariables(variables)); // we replace the previous entry
 		return true;
 	}
 
 	@Override
 	public boolean load() {
 		DefaultVariables data = getParser().getCurrentScript().getData(DefaultVariables.class);
+		if (data == null) { // this shouldn't happen
+			Skript.error("Default variables data missing");
+			return false;
+		} else if (data.isLoaded()) {
+			return true;
+		}
 		for (NonNullPair<String, Object> pair : data.getVariables()) {
 			String name = pair.getKey();
 			if (Variables.getVariable(name, null, false) != null)
 				continue;
-
 			Variables.setVariable(name, pair.getValue(), null, false);
 		}
+		data.loaded = true;
 		return true;
 	}
 
@@ -238,8 +277,13 @@ public class StructVariables extends Structure {
 	public void postUnload() {
 		Script script = getParser().getCurrentScript();
 		DefaultVariables data = script.getData(DefaultVariables.class);
-		for (NonNullPair<String, Object> pair : data.getVariables())
-			Variables.setVariable(pair.getKey(), null, null, false);
+		if (data == null) // band-aid fix for this section's behaviour being handled by a previous section
+			return; // see https://github.com/SkriptLang/Skript/issues/6013
+		for (NonNullPair<String, Object> pair : data.getVariables()) {
+			String name = pair.getKey();
+			if (name.contains("<") && name.contains(">")) // probably a template made by us
+				Variables.setVariable(pair.getKey(), null, null, false);
+		}
 		script.removeData(DefaultVariables.class);
 	}
 

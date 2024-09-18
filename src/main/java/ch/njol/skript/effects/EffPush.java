@@ -21,7 +21,7 @@ package ch.njol.skript.effects;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -77,6 +77,10 @@ public class EffPush extends Effect {
 			final Vector mod = d.getDirection(en);
 			if (v != null)
 				mod.normalize().multiply(v.doubleValue());
+			if (!(Double.isFinite(mod.getX()) && Double.isFinite(mod.getY()) && Double.isFinite(mod.getZ()))) {
+				// Some component of the mod vector is not finite, so just stop
+				return;
+			}
 			en.setVelocity(en.getVelocity().add(mod)); // REMIND add NoCheatPlus exception to players
 		}
 	}

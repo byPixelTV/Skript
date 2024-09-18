@@ -20,7 +20,7 @@ package ch.njol.skript.effects;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -46,7 +46,7 @@ public class EffSwingHand extends Effect {
 			"make %livingentities% swing [their] off[ ]hand");
 	}
 	
-	private static final boolean SWINGING_IS_SUPPORTED = Skript.methodExists(LivingEntity.class, "swingMainHand");
+	public static final boolean SWINGING_IS_SUPPORTED = Skript.methodExists(LivingEntity.class, "swingMainHand");
 	
 	@SuppressWarnings("null")
 	private Expression<LivingEntity> entities;

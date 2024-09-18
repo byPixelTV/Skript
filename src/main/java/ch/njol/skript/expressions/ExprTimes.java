@@ -34,7 +34,7 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.Iterators;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.stream.LongStream;
@@ -107,8 +107,8 @@ public class ExprTimes extends SimpleExpression<Long> {
 		Number end = this.end.getSingle(e);
 		if (end == null)
 			return null;
-
-		return LongStream.range(1, end.longValue() + 1).iterator();
+		long fixed = (long) (end.doubleValue() + Skript.EPSILON);
+		return LongStream.range(1, fixed + 1).iterator();
 	}
 
 	@Override

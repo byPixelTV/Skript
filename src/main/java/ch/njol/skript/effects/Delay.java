@@ -35,7 +35,7 @@ import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
@@ -108,7 +108,7 @@ public class Delay extends Effect {
 				Variables.removeLocals(event); // Clean up local vars, we may be exiting now
 
 				SkriptTimings.stop(timing); // Stop timing if it was even started
-			}, Math.max(duration.getTicks_i(), 1)); // Minimum delay is one tick, less than it is useless!
+			}, Math.max(duration.getTicks(), 1)); // Minimum delay is one tick, less than it is useless!
 		}
 		return null;
 	}

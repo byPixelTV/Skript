@@ -23,14 +23,20 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.njol.util.Kleenean;
+import org.bukkit.World;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Armadillo;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Blaze;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Bogged;
+import org.bukkit.entity.Breeze;
 import org.bukkit.entity.Camel;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.ChestedHorse;
@@ -39,6 +45,7 @@ import org.bukkit.entity.Cod;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Donkey;
 import org.bukkit.entity.DragonFireball;
@@ -70,7 +77,9 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.Illager;
 import org.bukkit.entity.Illusioner;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LargeFireball;
 import org.bukkit.entity.LeashHitch;
@@ -104,6 +113,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.SmallFireball;
+import org.bukkit.entity.Sniffer;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SpectralArrow;
@@ -114,6 +124,7 @@ import org.bukkit.entity.Stray;
 import org.bukkit.entity.Strider;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tadpole;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Trident;
@@ -124,6 +135,7 @@ import org.bukkit.entity.Vindicator;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.entity.Warden;
 import org.bukkit.entity.WaterMob;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
@@ -131,31 +143,27 @@ import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Zoglin;
 import org.bukkit.entity.Zombie;
 import org.bukkit.entity.ZombieHorse;
-import org.eclipse.jdt.annotation.Nullable;
+
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.yggdrasil.Fields;
 
-/**
- * @author Peter Güttinger
- */
 public class SimpleEntityData extends EntityData<Entity> {
 	
 	public final static class SimpleEntityDataInfo {
 		final String codeName;
 		final Class<? extends Entity> c;
 		final boolean isSupertype;
+		final Kleenean allowSpawning;
 		
-		SimpleEntityDataInfo(final String codeName, final Class<? extends Entity> c) {
-			this(codeName, c, false);
-		}
-		
-		SimpleEntityDataInfo(final String codeName, final Class<? extends Entity> c, final boolean isSupertype) {
+		SimpleEntityDataInfo(String codeName, Class<? extends Entity> c, boolean isSupertype, Kleenean allowSpawning) {
 			this.codeName = codeName;
 			this.c = c;
 			this.isSupertype = isSupertype;
+			this.allowSpawning = allowSpawning;
 		}
 		
 		@Override
@@ -183,11 +191,18 @@ public class SimpleEntityData extends EntityData<Entity> {
 	private final static List<SimpleEntityDataInfo> types = new ArrayList<>();
 
 	private static void addSimpleEntity(String codeName, Class<? extends Entity> entityClass) {
-		types.add(new SimpleEntityDataInfo(codeName, entityClass));
+		addSimpleEntity(codeName, entityClass, Kleenean.UNKNOWN);
+	}
+
+	/**
+	 * @param allowSpawning Whether to override the default {@link #canSpawn(World)} behavior and allow this entity to be spawned.
+	 */
+	private static void addSimpleEntity(String codeName, Class<? extends Entity> entityClass, Kleenean allowSpawning) {
+		types.add(new SimpleEntityDataInfo(codeName, entityClass, false, allowSpawning));
 	}
 
 	private static void addSuperEntity(String codeName, Class<? extends Entity> entityClass) {
-		types.add(new SimpleEntityDataInfo(codeName, entityClass, true));
+		types.add(new SimpleEntityDataInfo(codeName, entityClass, true, Kleenean.UNKNOWN));
 	}
 	static {
 		// Simple Entities
@@ -230,7 +245,9 @@ public class SimpleEntityData extends EntityData<Entity> {
 		addSimpleEntity("witch", Witch.class);
 		addSimpleEntity("wither", Wither.class);
 		addSimpleEntity("wither skull", WitherSkull.class);
-		addSimpleEntity("firework", Firework.class);
+		// bukkit marks fireworks as not spawnable
+		// see https://hub.spigotmc.org/jira/browse/SPIGOT-7677
+		addSimpleEntity("firework", Firework.class, Kleenean.TRUE);
 		addSimpleEntity("endermite", Endermite.class);
 		addSimpleEntity("armor stand", ArmorStand.class);
 		addSimpleEntity("shulker", Shulker.class);
@@ -296,7 +313,26 @@ public class SimpleEntityData extends EntityData<Entity> {
 
 		if (Skript.isRunningMinecraft(1,19,3))
 			addSimpleEntity("camel", Camel.class);
-		
+
+		if (Skript.isRunningMinecraft(1,19,4)) {
+			addSimpleEntity("sniffer", Sniffer.class);
+			addSimpleEntity("text display", TextDisplay.class);
+			addSimpleEntity("item display", ItemDisplay.class);
+			addSimpleEntity("block display", BlockDisplay.class);
+			addSimpleEntity("interaction", Interaction.class);
+			addSuperEntity("display", Display.class);
+		}
+
+		if (Skript.isRunningMinecraft(1, 20, 3)) {
+			addSimpleEntity("breeze", Breeze.class);
+			addSimpleEntity("wind charge", WindCharge.class);
+		}
+
+		if (Skript.isRunningMinecraft(1,20,5)) {
+			addSimpleEntity("armadillo", Armadillo.class);
+			addSimpleEntity("bogged", Bogged.class);
+		}
+
 		// Register zombie after Husk and Drowned to make sure both work
 		addSimpleEntity("zombie", Zombie.class);
 		// Register squid after glow squid to make sure both work
@@ -309,6 +345,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		addSuperEntity("mob", Mob.class);
 		addSuperEntity("creature", Creature.class);
 		addSuperEntity("animal", Animals.class);
+		addSuperEntity("fish", Fish.class);
 		addSuperEntity("golem", Golem.class);
 		addSuperEntity("projectile", Projectile.class);
 		addSuperEntity("living entity", LivingEntity.class);
@@ -421,7 +458,16 @@ public class SimpleEntityData extends EntityData<Entity> {
 		final SimpleEntityData other = (SimpleEntityData) obj;
 		return info.equals(other.info);
 	}
-	
+
+	@Override
+	public boolean canSpawn(@Nullable World world) {
+		if (info.allowSpawning.isUnknown()) // unspecified, refer to default behavior
+			return super.canSpawn(world);
+		if (world == null)
+			return false;
+		return info.allowSpawning.isTrue();
+	}
+
 	@Override
 	public Fields serialize() throws NotSerializableException {
 		final Fields f = super.serialize();

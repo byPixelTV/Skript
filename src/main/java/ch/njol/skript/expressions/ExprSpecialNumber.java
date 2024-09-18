@@ -29,11 +29,11 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Name("Special Number")
 @Description("Special number values, namely NaN, Infinity and -Infinity")
-@Examples({"if {_number} is NaN value:"})
+@Examples({"if {_number} is infinity value:"})
 @Since("2.2-dev32d")
 public class ExprSpecialNumber extends SimpleExpression<Number> {
 	private int value;

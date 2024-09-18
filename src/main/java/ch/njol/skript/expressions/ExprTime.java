@@ -20,7 +20,7 @@ package ch.njol.skript.expressions;
 
 import org.bukkit.World;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -106,7 +106,7 @@ public class ExprTime extends PropertyExpression<World, Time> {
 				assert delta != null;
 				final Timespan ts = (Timespan) delta[0];
 				for (final World w : worlds) {
-					w.setTime(w.getTime() + mod * ts.getTicks_i());
+					w.setTime(w.getTime() + mod * ts.getTicks());
 				}
 				break;
 			case DELETE:

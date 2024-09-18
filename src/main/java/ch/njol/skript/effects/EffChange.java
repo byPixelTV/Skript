@@ -21,10 +21,15 @@ package ch.njol.skript.effects;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-import org.skriptlang.skript.lang.script.Script;
+import ch.njol.skript.expressions.ExprParse;
+import ch.njol.skript.lang.Effect;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.ExpressionList;
+import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Variable;
 import org.skriptlang.skript.lang.script.ScriptWarning;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
@@ -35,11 +40,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Effect;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.log.CountingLogHandler;
 import ch.njol.skript.log.ErrorQuality;
@@ -89,7 +90,7 @@ public class EffChange extends Effect {
 			{"remove (all|every) %objects% from %~objects%", ChangeMode.REMOVE_ALL},
 			
 			{"(remove|subtract) %objects% from %~objects%", ChangeMode.REMOVE},
-			{"reduce %~objects% by %objects%", ChangeMode.REMOVE},
+			{"(reduce|decrease) %~objects% by %objects%", ChangeMode.REMOVE},
 			
 			{"(delete|clear) %~objects%", ChangeMode.DELETE},
 			
@@ -249,7 +250,7 @@ public class EffChange extends Effect {
 			assert x != null;
 			changer = ch = v;
 			
-			if (!ch.isSingle() && single) {
+			if (!ch.canBeSingle() && single) {
 				if (mode == ChangeMode.SET)
 					Skript.error(changed + " can only be set to one " + Classes.getSuperClassInfo(x).getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
 				else
@@ -257,8 +258,17 @@ public class EffChange extends Effect {
 				return false;
 			}
 
-			if (changed instanceof Variable) {
-				Variable<?> variable = (Variable<?>) changed;
+			if (changed instanceof Variable variable) {
+				if (!changed.isSingle() && mode == ChangeMode.SET) {
+					if (ch instanceof ExprParse exprParse) {
+						exprParse.flatten = false;
+					} else if (ch instanceof ExpressionList expressionList) {
+						for (Expression<?> expression : expressionList.getExpressions()) {
+							if (expression instanceof ExprParse exprParse)
+							exprParse.flatten = false;
+						}
+					}
+				}
 				VariableString name = variable.getName();
 				if (mode == ChangeMode.SET || (variable.isList() && mode == ChangeMode.ADD)) {
 					if (variable.isLocal()) {

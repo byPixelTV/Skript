@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -41,7 +41,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Scoreboard Tags")
 @Description({"Scoreboard tags are simple list of texts stored directly in the data of an <a href='classes.html#entity'>entity</a>.",
 		"So this is a Minecraft related thing, not Bukkit, so the tags will not get removed when the server stops. " +
-		"You can visit <a href='https://minecraft.gamepedia.com/Scoreboard#Tags'>visit Minecraft Wiki</a> for more info.",
+		"You can visit <a href='https://minecraft.wiki/w/Scoreboard#Tags'>visit Minecraft Wiki</a> for more info.",
 		"This is changeable and valid for any type of entity. " +
 		"Also you can use use the <a href='conditions.html#CondHasScoreboardTag'>Has Scoreboard Tag</a> condition to check whether an entity has the given tags.",
 		"",

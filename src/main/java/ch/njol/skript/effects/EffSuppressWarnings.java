@@ -28,7 +28,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.script.ScriptWarning;
 
 @Name("Locally Suppress Warning")
@@ -42,12 +42,30 @@ public class EffSuppressWarnings extends Effect {
 
 	static {
 		Skript.registerEffect(EffSuppressWarnings.class,
-			"[local[ly]] suppress [the] (1:conflict|2:variable save|3:[missing] conjunction[s]|4:starting [with] expression[s]|5:local variable type[s]) warning[s]"
+			"[local[ly]] suppress [the] (1:variable save|2:[missing] conjunction[s]|3:starting [with] expression[s]|4:deprecated syntax|5:local variable type[s]) warning[s]"
 		);
 	}
 
-	private static final int CONFLICT = 1, INSTANCE = 2, CONJUNCTION = 3, START_EXPR = 4, LOCAL_TYPES = 5;
-	private int mark = 0;
+	private enum Pattern {
+		INSTANCE(ScriptWarning.VARIABLE_SAVE),
+		CONJUNCTION(ScriptWarning.MISSING_CONJUNCTION),
+		START_EXPR(ScriptWarning.VARIABLE_STARTS_WITH_EXPRESSION),
+		DEPRECATED(ScriptWarning.DEPRECATED_SYNTAX),
+		LOCAL_TYPES(ScriptWarning.LOCAL_VARIABLE_TYPE);
+
+		private final ScriptWarning warning;
+
+		Pattern(ScriptWarning warning) {
+			this.warning = warning;
+		}
+
+		public ScriptWarning getWarning() {
+			return warning;
+		}
+
+	}
+
+	private Pattern pattern;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
@@ -56,12 +74,8 @@ public class EffSuppressWarnings extends Effect {
 			return false;
 		}
 
-		mark = parseResult.mark;
-		if (mark == 1) {
-			Skript.warning("Variable conflict warnings no longer need suppression, as they have been removed altogether");
-		} else {
-			getParser().getCurrentScript().suppressWarning(ScriptWarning.values()[mark - 2]);
-		}
+		pattern = Pattern.values()[parseResult.mark - 1];
+		getParser().getCurrentScript().suppressWarning(pattern.getWarning());
 		return true;
 	}
 
@@ -71,10 +85,7 @@ public class EffSuppressWarnings extends Effect {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		String word;
-		switch (mark) {
-			case CONFLICT:
-				word = "conflict";
-				break;
+		switch (pattern) {
 			case INSTANCE:
 				word = "variable save";
 				break;
@@ -83,6 +94,9 @@ public class EffSuppressWarnings extends Effect {
 				break;
 			case START_EXPR:
 				word = "starting expression";
+				break;
+			case DEPRECATED:
+				word = "deprecated syntax";
 				break;
 			case LOCAL_TYPES:
 				word = "local variable types";

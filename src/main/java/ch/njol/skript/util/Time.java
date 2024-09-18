@@ -21,17 +21,18 @@ package ch.njol.skript.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.localization.Message;
 import ch.njol.util.Math2;
 import ch.njol.yggdrasil.YggdrasilSerializable;
+import org.skriptlang.skript.lang.util.Cyclical;
 
 /**
  * @author Peter Güttinger
  */
-public class Time implements YggdrasilSerializable {
+public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	
 	private final static int TICKS_PER_HOUR = 1000, TICKS_PER_DAY = 24 * TICKS_PER_HOUR;
 	private final static double TICKS_PER_MINUTE = 1000. / 60;
@@ -152,6 +153,16 @@ public class Time implements YggdrasilSerializable {
 			return false;
 		final Time other = (Time) obj;
 		return time == other.time;
+	}
+	
+	@Override
+	public Integer getMaximum() {
+		return TICKS_PER_DAY;
+	}
+	
+	@Override
+	public Integer getMinimum() {
+		return 0;
 	}
 	
 }

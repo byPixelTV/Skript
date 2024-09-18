@@ -46,7 +46,7 @@ import ch.njol.util.OpenCloseable;
 import ch.njol.util.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.structure.Structure;
 
@@ -60,8 +60,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -229,8 +231,9 @@ public class ScriptLoader {
 	private static final FileFilter disabledScriptFilter =
 		f -> f != null
 			&& (f.isDirectory() && !f.getName().startsWith(".") || !f.isDirectory() && StringUtils.endsWithIgnoreCase(f.getName(), ".sk"))
-			&& f.getName().startsWith(DISABLED_SCRIPT_PREFIX) && !f.isHidden();
-	
+			&& f.getName().startsWith(DISABLED_SCRIPT_PREFIX)
+			&& !f.isHidden();
+
 	/**
 	 * Reevaluates {@link #disabledScripts}.
 	 * @param path the scripts folder to use for the reevaluation.
@@ -490,7 +493,7 @@ public class ScriptLoader {
 		
 		ScriptInfo scriptInfo = new ScriptInfo();
 
-		List<NonNullPair<Script, List<Structure>>> scripts = new ArrayList<>();
+		List<LoadingScriptInfo> scripts = new ArrayList<>();
 
 		List<CompletableFuture<Void>> scriptInfoFutures = new ArrayList<>();
 		for (Config config : configs) {
@@ -498,9 +501,9 @@ public class ScriptLoader {
 				throw new NullPointerException();
 			
 			CompletableFuture<Void> future = makeFuture(() -> {
-				NonNullPair<Script, List<Structure>> pair = loadScript(config);
-				scripts.add(pair);
-				scriptInfo.add(new ScriptInfo(1, pair.getSecond().size()));
+				LoadingScriptInfo info = loadScript(config);
+				scripts.add(info);
+				scriptInfo.add(new ScriptInfo(1, info.structures.size()));
 				return null;
 			}, openCloseable);
 			
@@ -516,67 +519,92 @@ public class ScriptLoader {
 				try {
 					openCloseable.open();
 
-					scripts.stream()
-						.flatMap(pair -> { // Flatten each entry down to a stream of Script-Structure pairs
-							return pair.getSecond().stream()
-								.map(structure -> new NonNullPair<>(pair, structure));
-						})
-						.sorted(Comparator.comparing(pair -> pair.getSecond().getPriority()))
-						.forEach(pair -> {
-							Script script = pair.getFirst().getFirst();
-							Structure structure = pair.getSecond();
+					// build sorted list
+					// this nest of pairs is terrible, but we need to keep the reference to the modifiable structures list
+					List<NonNullPair<LoadingScriptInfo, Structure>> pairs = scripts.stream()
+							.flatMap(info -> { // Flatten each entry down to a stream of Script-Structure pairs
+								return info.structures.stream()
+										.map(structure -> new NonNullPair<>(info, structure));
+							})
+							.sorted(Comparator.comparing(pair -> pair.getSecond().getPriority()))
+							.collect(Collectors.toCollection(ArrayList::new));
 
-							parser.setActive(script);
-							parser.setCurrentStructure(structure);
-							parser.setNode(structure.getEntryContainer().getSource());
+					// pre-loading
+					pairs.removeIf(pair -> {
+						LoadingScriptInfo loadingInfo = pair.getFirst();
+						Structure structure = pair.getSecond();
 
-							try {
-								if (!structure.preLoad())
-									pair.getFirst().getSecond().remove(structure);
-							} catch (Exception e) {
-								//noinspection ThrowableNotThrown
-								Skript.exception(e, "An error occurred while trying to load a Structure.");
-								pair.getFirst().getSecond().remove(structure);
+						parser.setActive(loadingInfo.script);
+						parser.setCurrentStructure(structure);
+						parser.setNode(loadingInfo.nodeMap.get(structure));
+
+						try {
+							if (!structure.preLoad()) {
+								loadingInfo.structures.remove(structure);
+								return true;
 							}
-						});
-
+						} catch (Exception e) {
+							//noinspection ThrowableNotThrown
+							Skript.exception(e, "An error occurred while trying to preLoad a Structure.");
+							loadingInfo.structures.remove(structure);
+							return true;
+						}
+						return false;
+					});
 					parser.setInactive();
 
-					// TODO in the future, Structure#load should be split across multiple threads if parallel loading is enabled.
+					// TODO in the future, Structure#load/Structure#postLoad should be split across multiple threads if parallel loading is enabled.
 					// However, this is not possible right now as reworks in multiple areas will be needed.
 					// For example, the "Commands" class still uses a static list for currentArguments that is cleared between loads.
 					// Until these reworks happen, limiting main loading to asynchronous (not parallel) is the only choice we have.
-					for (NonNullPair<Script, List<Structure>> pair : scripts) {
-						parser.setActive(pair.getFirst());
-						pair.getSecond().removeIf(structure -> {
-							parser.setCurrentStructure(structure);
-							parser.setNode(structure.getEntryContainer().getSource());
-							try {
-								return !structure.load();
-							} catch (Exception e) {
-								//noinspection ThrowableNotThrown
-								Skript.exception(e, "An error occurred while trying to load a Structure.");
+
+					// loading
+					pairs.removeIf(pair -> {
+						LoadingScriptInfo loadingInfo = pair.getFirst();
+						Structure structure = pair.getSecond();
+
+						parser.setActive(loadingInfo.script);
+						parser.setCurrentStructure(structure);
+						parser.setNode(loadingInfo.nodeMap.get(structure));
+
+						try {
+							if (!structure.load()) {
+								loadingInfo.structures.remove(structure);
 								return true;
 							}
-						});
-					}
-
+						} catch (Exception e) {
+							//noinspection ThrowableNotThrown
+							Skript.exception(e, "An error occurred while trying to load a Structure.");
+							loadingInfo.structures.remove(structure);
+							return true;
+						}
+						return false;
+					});
 					parser.setInactive();
 
-					for (NonNullPair<Script, List<Structure>> pair : scripts) {
-						parser.setActive(pair.getFirst());
-						pair.getSecond().removeIf(structure -> {
-							parser.setCurrentStructure(structure);
-							parser.setNode(structure.getEntryContainer().getSource());
-							try {
-								return !structure.postLoad();
-							} catch (Exception e) {
-								//noinspection ThrowableNotThrown
-								Skript.exception(e, "An error occurred while trying to load a Structure.");
+					// post-loading
+					pairs.removeIf(pair -> {
+						LoadingScriptInfo loadingInfo = pair.getFirst();
+						Structure structure = pair.getSecond();
+
+						parser.setActive(loadingInfo.script);
+						parser.setCurrentStructure(structure);
+						parser.setNode(loadingInfo.nodeMap.get(structure));
+
+						try {
+							if (!structure.postLoad()) {
+								loadingInfo.structures.remove(structure);
 								return true;
 							}
-						});
-					}
+						} catch (Exception e) {
+							//noinspection ThrowableNotThrown
+							Skript.exception(e, "An error occurred while trying to postLoad a Structure.");
+							loadingInfo.structures.remove(structure);
+							return true;
+						}
+						return false;
+					});
+					parser.setInactive();
 
 					return scriptInfo;
 				} catch (Exception e) {
@@ -590,17 +618,34 @@ public class ScriptLoader {
 			});
 	}
 
+	private static class LoadingScriptInfo {
+
+		public final Script script;
+
+		public final List<Structure> structures;
+
+		public final Map<Structure, Node> nodeMap;
+
+		public LoadingScriptInfo(Script script, List<Structure> structures, Map<Structure, Node> nodeMap) {
+			this.script = script;
+			this.structures = structures;
+			this.nodeMap = nodeMap;
+		}
+
+	}
+
 	/**
 	 * Creates a script and loads the provided config into it.
 	 * @param config The config to load into a script.
-	 * @return The script that was loaded.
+	 * @return A pair containing the script that was loaded and a modifiable version of the structures list.
 	 */
 	// Whenever you call this method, make sure to also call PreScriptLoadEvent
-	private static NonNullPair<Script, List<Structure>> loadScript(Config config) {
+	private static LoadingScriptInfo loadScript(Config config) {
 		if (config.getFile() == null)
 			throw new IllegalArgumentException("A config must have a file to be loaded.");
 
 		ParserInstance parser = getParser();
+		Map<Structure, Node> nodeMap = new HashMap<>();
 		List<Structure> structures = new ArrayList<>();
 		Script script = new Script(config, structures);
 		parser.setActive(script);
@@ -610,16 +655,17 @@ public class ScriptLoader {
 				SkriptConfig.configs.add(config);
 			
 			try (CountingLogHandler ignored = new CountingLogHandler(SkriptLogger.SEVERE).start()) {
-				for (Node cnode : config.getMainNode()) {
-					if (!(cnode instanceof SectionNode)) {
-						Skript.error("invalid line - all code has to be put into triggers");
+				for (Node node : config.getMainNode()) {
+					if (!(node instanceof SimpleNode) && !(node instanceof SectionNode)) {
+						// unlikely to occur, but just in case
+						Skript.error("could not interpret line as a structure");
 						continue;
 					}
 
-					SectionNode node = ((SectionNode) cnode);
 					String line = node.getKey();
 					if (line == null)
 						continue;
+					line = replaceOptions(line); // replace options here before validation
 
 					if (!SkriptParser.validateLine(line))
 						continue;
@@ -627,14 +673,13 @@ public class ScriptLoader {
 					if (Skript.logVeryHigh() && !Skript.debug())
 						Skript.info("loading trigger '" + line + "'");
 
-					line = replaceOptions(line);
-
 					Structure structure = Structure.parse(line, node, "Can't understand this structure: " + line);
 
 					if (structure == null)
 						continue;
 
 					structures.add(structure);
+					nodeMap.put(structure, node);
 				}
 				
 				if (Skript.logHigh()) {
@@ -672,8 +717,8 @@ public class ScriptLoader {
 				Skript.exception(e);
 			}
 		}
-		
-		return new NonNullPair<>(script, structures);
+
+		return new LoadingScriptInfo(script, structures, nodeMap);
 	}
 
 	/*
@@ -905,22 +950,22 @@ public class ScriptLoader {
 		if (Skript.debug())
 			parser.setIndentation(parser.getIndentation() + "    ");
 
-		ArrayList<TriggerItem> items = new ArrayList<>();
+		List<TriggerItem> items = new ArrayList<>();
 		try {
 			TypeHints.enterScope();
 			for (Node subNode : node) {
 				parser.setNode(subNode);
-	
+
 				String subNodeKey = subNode.getKey();
 				if (subNodeKey == null)
 					throw new IllegalArgumentException("Encountered node with null key: '" + subNode + "'");
 				String expr = replaceOptions(subNodeKey);
 				if (!SkriptParser.validateLine(expr))
 					continue;
-	
+
 				if (subNode instanceof SimpleNode) {
 					long start = System.currentTimeMillis();
-					Statement stmt = Statement.parse(expr, "Can't understand this condition/effect: " + expr);
+					Statement stmt = Statement.parse(expr, items, "Can't understand this condition/effect: " + expr);
 					if (stmt == null)
 						continue;
 					long requiredTime = SkriptConfig.longParseTimeWarningThreshold.value().getMilliSeconds();
@@ -1007,20 +1052,6 @@ public class ScriptLoader {
 	 */
 
 	/**
-	 * Reloads a single script.
-	 * @param scriptFile The file representing the script to reload.
-	 * @return Future of statistics of the newly loaded script.
-	 * @deprecated Use {@link #reloadScript(Script, OpenCloseable)}.
-	 */
-	@Deprecated
-	public static CompletableFuture<ScriptInfo> reloadScript(File scriptFile, OpenCloseable openCloseable) {
-		Script script = getScript(scriptFile);
-		if (script == null)
-			return CompletableFuture.completedFuture(new ScriptInfo());
-		return reloadScript(script, openCloseable);
-	}
-
-	/**
 	 * Unloads the provided script.
 	 * @param scriptFile The file representing the script to unload.
 	 * @return Statistics for the unloaded script.
@@ -1047,6 +1078,18 @@ public class ScriptLoader {
 	}
 
 	/**
+	 * Reloads a single script.
+	 * @param scriptFile The file representing the script to reload.
+	 * @return Future of statistics of the newly loaded script.
+	 * @deprecated Use {@link #reloadScript(Script, OpenCloseable)}.
+	 */
+	@Deprecated
+	public static CompletableFuture<ScriptInfo> reloadScript(File scriptFile, OpenCloseable openCloseable) {
+		unloadScript(scriptFile);
+		return loadScripts(scriptFile, openCloseable);
+	}
+
+	/**
 	 * Reloads all scripts in the given folder and its subfolders.
 	 * @param folder A folder.
 	 * @return Future of statistics of newly loaded scripts.
@@ -1055,7 +1098,7 @@ public class ScriptLoader {
 	@Deprecated
 	public static CompletableFuture<ScriptInfo> reloadScripts(File folder, OpenCloseable openCloseable) {
 		unloadScripts(folder);
-		return loadScripts(loadStructures(folder), openCloseable);
+		return loadScripts(folder, openCloseable);
 	}
 
 	/**

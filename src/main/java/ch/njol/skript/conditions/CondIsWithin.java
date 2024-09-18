@@ -37,7 +37,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Name("Is Within")
 @Description({
@@ -135,12 +135,12 @@ public class CondIsWithin extends Condition {
 
 		// Chunks
 		if (area instanceof Chunk) {
-			return locsToCheck.check(event, (loc) -> loc.getChunk() == area, isNegated());
+			return locsToCheck.check(event, (loc) -> loc.getChunk().equals(area), isNegated());
 		}
 
 		// Worlds
 		if (area instanceof World) {
-			return locsToCheck.check(event, (loc) -> loc.getWorld() == area, isNegated());
+			return locsToCheck.check(event, (loc) -> loc.getWorld().equals(area), isNegated());
 		}
 
 		// fall-back
