@@ -43,6 +43,7 @@ public class ExprItemAmount extends SimplePropertyExpression<Object, Long> {
 
 	@Override
 	public Long convert(final Object item) {
+		System.out.println("item: " + item);
 		if (item instanceof ItemType) {
 			return (long) ((ItemType) item).getAmount();
 		} else if (item instanceof Slot) {
