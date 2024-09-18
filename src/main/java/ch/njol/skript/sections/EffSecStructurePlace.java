@@ -28,7 +28,7 @@ import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.structure.Structure;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import ch.njol.skript.Skript;
@@ -176,8 +176,9 @@ public class EffSecStructurePlace extends EffectSection {
 			Variables.removeLocals(details);
 		}
 
-		for (Location location : locations.getArray(event))
+		for (Location location : locations.getArray(event)) {
 			structure.place(location, details.includeEntities(), details.getRotation(), details.getMirror(), details.getPallet(), details.getIntegrity(), new Random());
+		}
 
 		return super.walk(event, false);
 	}

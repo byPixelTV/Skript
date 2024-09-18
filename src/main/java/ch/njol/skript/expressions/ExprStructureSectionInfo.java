@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -37,7 +37,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.sections.EffSecStructurePlace;
 import ch.njol.skript.sections.EffSecStructurePlace.StructurePlaceEvent;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;

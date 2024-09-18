@@ -33,7 +33,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.structure.Structure;
 import org.bukkit.util.BlockVector;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -64,7 +64,7 @@ public class ExprStructureInfo extends PropertyExpression<Structure, Object> {
 
 	static {
 		if (Skript.classExists("org.bukkit.structure.Structure"))
-			register(ExprStructureInfo.class, Object.class, "[structure] (:blocks|:entities|name:name[s]|size:(size|[lowest] [block] vector)[s])", "structures");
+			register(ExprStructureInfo.class, Object.class, "[structure] (:blocks|:entities|name:name[s]|size:[vector] size[s])", "structures");
 	}
 
 	private enum Property {
