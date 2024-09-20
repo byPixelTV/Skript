@@ -32,8 +32,8 @@ import ch.njol.util.NonNullPair;
 
 import com.zaxxer.hikari.HikariConfig;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
+import org.jetbrains.annotations.Nullable;
 
 @Deprecated
 @ScheduledForRemoval
