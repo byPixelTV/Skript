@@ -42,6 +42,7 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.SynchronizedReference;
 
@@ -221,12 +222,11 @@ public abstract class JdbcStorage extends VariablesStorage {
 	 * {@link Variables#variableLoaded(String, Object, VariablesStorage)}).
 	 */
 	@Override
-	protected final boolean load(SectionNode section) {
+	protected final boolean loadAbstract(SectionNode section) {
 		synchronized (database) {
 			Timespan monitor_interval = getValue(section, "monitor interval", Timespan.class);
-			this.monitor = monitor_interval != null;
-			if (monitor)
-				this.monitor_interval = monitor_interval.getMilliSeconds();
+			if (this.monitor = monitor_interval != null)
+				this.monitor_interval = monitor_interval.getAs(TimePeriod.MILLISECOND);
 
 			HikariConfig configuration = configuration(section);
 			if (configuration == null)
@@ -234,7 +234,7 @@ public abstract class JdbcStorage extends VariablesStorage {
 
 			Timespan commit_changes = getOptional(section, "commit changes", Timespan.class);
 			if (commit_changes != null)
-				enablePeriodicalCommits(configuration, commit_changes.getMilliSeconds());
+				enablePeriodicalCommits(configuration, commit_changes.getAs(TimePeriod.MILLISECOND));
 
 			// Max lifetime is 30 minutes, idle lifetime is 10 minutes. This value has to be less than.
 			configuration.setKeepaliveTime(TimeUnit.MINUTES.toMillis(5));
@@ -284,22 +284,14 @@ public abstract class JdbcStorage extends VariablesStorage {
 				sqlException(e);
 				return false;
 			}
-			return loadJdbcConfiguration(section);
+			return load(section);
 		}
 	}
 
 	/**
-	 * Override for custom configuration nodes.
-	 * <p>
-	 * Loads any custom configurations from the section node
-	 * after internal Skript has loaded required nodes for Jdbc databases.
-	 * 
-	 * @param section The section node from the config.sk database type this class reflects.
-	 * @return true if this configuration was successfully loaded and passed all required nodes.
+	 * Override this method to load an custom configuration from the SectionNode.
 	 */
-	// Since load_i(SectionNode) is final and load(SectionNode) needs to be final,
-	// this method is for extending JdbcStorage classes.
-	protected boolean loadJdbcConfiguration(SectionNode section) {
+	public boolean load(SectionNode n) {
 		return true;
 	}
 

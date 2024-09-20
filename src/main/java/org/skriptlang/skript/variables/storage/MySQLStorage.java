@@ -50,7 +50,7 @@ public class MySQLStorage extends JdbcStorage {
 
 	@Override
 	@Nullable
-	public HikariConfig configuration(SectionNode section) {
+	public final HikariConfig configuration(SectionNode section) {
 		String host = getValue(section, "host");
 		Integer port = getValue(section, "port", Integer.class);
 		String database = getValue(section, "database");

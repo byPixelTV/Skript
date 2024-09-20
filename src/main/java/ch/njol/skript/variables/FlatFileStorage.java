@@ -139,9 +139,9 @@ public class FlatFileStorage extends VariablesStorage {
 	 * Doesn't lock the connection, as required by
 	 * {@link Variables#variableLoaded(String, Object, VariablesStorage)}.
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
-	protected boolean load(SectionNode sectionNode) {
+	@SuppressWarnings("deprecation")
+	protected final boolean load(SectionNode sectionNode) {
 		SkriptLogger.setNode(null);
 
 		if (file == null) {
@@ -483,9 +483,9 @@ public class FlatFileStorage extends VariablesStorage {
 			if (childNode == null)
 				continue; // Leaf node
 
-			if (childNode instanceof TreeMap) {
+			if (childNode instanceof TreeMap multiVariable) {
 				// TreeMap found, recurse
-				save(pw, parent + childKey + Variable.SEPARATOR, (TreeMap<String, Object>) childNode);
+				save(pw, parent + childKey + Variable.SEPARATOR, multiVariable);
 			} else {
 				// Remove variable separator if needed
 				String name = childKey == null ? parent.substring(0, parent.length() - Variable.SEPARATOR.length()) : parent + childKey;

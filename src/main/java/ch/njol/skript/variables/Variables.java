@@ -82,7 +82,7 @@ import ch.njol.skript.SkriptAddon;
  * @see #setVariable(String, Object, Event, boolean)
  * @see #getVariable(String, Event, boolean)
  */
-public class Variables {
+public final class Variables {
 
 	/**
 	 * The version of {@link Yggdrasil} this class is using.
@@ -224,9 +224,7 @@ public class Variables {
 			boolean successful = true;
 
 			for (Node node : (SectionNode) databases) {
-				if (node instanceof SectionNode) {
-					SectionNode sectionNode = (SectionNode) node;
-
+				if (node instanceof SectionNode sectionNode) {
 					String type = sectionNode.getValue("type");
 					if (type == null) {
 						Skript.error("Missing entry 'type' in database definition");
@@ -558,7 +556,7 @@ public class Variables {
 			}
 		};
 	}
-	
+
 	/**
 	 * Deletes a variable.
 	 *
@@ -892,7 +890,6 @@ public class Variables {
 	 */
 	public static SerializedVariable.@Nullable Value serialize(@Nullable Object value) {
 		assert Bukkit.isPrimaryThread();
-
 		return Classes.serialize(value);
 	}
 
