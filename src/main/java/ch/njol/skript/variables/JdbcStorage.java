@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
@@ -106,11 +105,11 @@ public abstract class JdbcStorage extends VariablesStorage {
 		this.table = "variables21";
 	}
 
-	public String getTableName() {
+	public final String getTableName() {
 		return table;
 	}
 
-	public void setTableName(String tableName) {
+	public final void setTableName(String tableName) {
 		this.table = tableName;
 	}
 
@@ -289,7 +288,7 @@ public abstract class JdbcStorage extends VariablesStorage {
 	}
 
 	/**
-	 * Override this method to load an custom configuration from the SectionNode.
+	 * Override this method to load a custom configuration reading.
 	 */
 	public boolean load(SectionNode n) {
 		return true;
