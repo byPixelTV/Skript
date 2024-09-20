@@ -30,7 +30,7 @@ import ch.njol.skript.localization.Language;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.Version;
 import ch.njol.skript.variables.Variables;
-import ch.njol.skript.variables.VariablesStorage;
+import ch.njol.skript.variables.VariableStorage;
 
 /**
  * Utility class for Skript addons. Use {@link Skript#registerAddon(JavaPlugin)} to create a SkriptAddon instance for your plugin.
@@ -94,7 +94,7 @@ public final class SkriptAddon {
 	 * @return This SkriptAddon for method chaining.
 	 * @throws SkriptAPIException if the operation was not successful because the storage class is already registered.
 	 */
-	public <T extends VariablesStorage> SkriptAddon registerStorage(Class<T> storage, String... names) throws SkriptAPIException {
+	public <T extends VariableStorage> SkriptAddon registerStorage(Class<T> storage, String... names) throws SkriptAPIException {
 		Variables.registerStorage(this, storage, names);
 		return this;
 	}

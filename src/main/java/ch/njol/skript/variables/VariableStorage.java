@@ -49,7 +49,7 @@ import ch.njol.util.Closeable;
  * @see DatabaseStorage
  */
 // FIXME ! large databases (>25 MB) cause the server to be unresponsive instead of loading slowly
-public abstract class VariablesStorage implements Closeable {
+public abstract class VariableStorage implements Closeable {
 
 	/**
 	 * The size of the variable changes queue.
@@ -102,7 +102,7 @@ public abstract class VariablesStorage implements Closeable {
 	 *
 	 * @param name the name.
 	 */
-	protected VariablesStorage(SkriptAddon source, String name) {
+	protected VariableStorage(SkriptAddon source, String name) {
 		assert name != null;
 		databaseName = name;
 		this.source = source;
@@ -193,7 +193,6 @@ public abstract class VariablesStorage implements Closeable {
 	@Nullable
 	private <T> T getValue(SectionNode sectionNode, String key, Class<T> type, boolean error) {
 		String rawValue = sectionNode.getValue(key);
-		// Section node doesn't have this key
 		if (rawValue == null) {
 			if (error)
 				Skript.error("The config is missing the entry for '" + key + "' in the database '" + databaseName + "'");

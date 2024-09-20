@@ -26,7 +26,7 @@ import ch.njol.skript.SkriptAddon;
  */
 public class UnloadedStorage {
 
-	private final Class<? extends VariablesStorage> storage;
+	private final Class<? extends VariableStorage> storage;
 	private final SkriptAddon source;
 	private final String[] names;
 
@@ -37,7 +37,7 @@ public class UnloadedStorage {
 	 * @param storage The class of the actual VariableStorage to initalize with.
 	 * @param names The possible user input names from the config.sk to match this storage.
 	 */
-	public UnloadedStorage(SkriptAddon source, Class<? extends VariablesStorage> storage, String... names) {
+	public UnloadedStorage(SkriptAddon source, Class<? extends VariableStorage> storage, String... names) {
 		this.storage = storage;
 		this.source = source;
 		this.names = names;
@@ -46,7 +46,7 @@ public class UnloadedStorage {
 	/**
 	 * @return the storage class
 	 */
-	public Class<? extends VariablesStorage> getStorageClass() {
+	public Class<? extends VariableStorage> getStorageClass() {
 		return storage;
 	}
 

@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  *  accessed. (rem: print a warning when Skript starts)
  *  rem: store null variables (in memory) to prevent looking up the same variables over and over again
  */
-public class FlatFileStorage extends VariablesStorage {
+public class FlatFileStorage extends VariableStorage {
 
 	/**
 	 * The {@link Charset} used in the CSV storage file.
@@ -137,7 +137,7 @@ public class FlatFileStorage extends VariablesStorage {
 	 * Loads the variables in the CSV file.
 	 * <p>
 	 * Doesn't lock the connection, as required by
-	 * {@link Variables#variableLoaded(String, Object, VariablesStorage)}.
+	 * {@link Variables#variableLoaded(String, Object, VariableStorage)}.
 	 */
 	@Override
 	@SuppressWarnings("deprecation")
@@ -492,7 +492,7 @@ public class FlatFileStorage extends VariablesStorage {
 
 				try {
 					// Loop over storages to make sure this variable is ours to store
-					for (VariablesStorage storage : Variables.STORAGES) {
+					for (VariableStorage storage : Variables.STORAGES) {
 						if (storage.accept(name)) {
 							if (storage == this) {
 								// Serialize the value

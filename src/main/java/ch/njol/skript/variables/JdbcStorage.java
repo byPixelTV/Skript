@@ -45,7 +45,7 @@ import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.SynchronizedReference;
 
-public abstract class JdbcStorage extends VariablesStorage {
+public abstract class JdbcStorage extends VariableStorage {
 
 	protected static final String DEFAULT_TABLE_NAME = "variables21";
 
@@ -218,7 +218,7 @@ public abstract class JdbcStorage extends VariablesStorage {
 
 	/**
 	 * Doesn't lock the database for reading (it's not used anywhere else, and locking while loading will interfere with loaded variables being deleted by
-	 * {@link Variables#variableLoaded(String, Object, VariablesStorage)}).
+	 * {@link Variables#variableLoaded(String, Object, VariableStorage)}).
 	 */
 	@Override
 	protected final boolean loadAbstract(SectionNode section) {
@@ -295,7 +295,8 @@ public abstract class JdbcStorage extends VariablesStorage {
 	}
 
 	/**
-	 * Doesn't lock the database - {@link #save(String, String, byte[])} does that // what?
+	 * Doesn't lock the database
+	 * {@link #save(String, String, byte[])} does that as values are inserted in the database.
 	 */
 	private void loadVariables(ResultSet result) throws SQLException {
 		SQLException e = Task.callSync(new Callable<SQLException>() {
