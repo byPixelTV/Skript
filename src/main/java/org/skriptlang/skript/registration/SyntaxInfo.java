@@ -5,6 +5,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.skriptlang.skript.registration.SyntaxInfoImpl.BuilderImpl;
+import org.skriptlang.skript.util.Builder.Buildable;
 import org.skriptlang.skript.util.Priority;
 
 import java.util.Collection;
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
  * @param <E> The class providing the implementation of the syntax this info represents.
  */
 @ApiStatus.Experimental
-public interface SyntaxInfo<E extends SyntaxElement> extends DefaultSyntaxInfos {
+public interface SyntaxInfo<E extends SyntaxElement> extends Buildable<SyntaxInfo.Builder<?, ?>, SyntaxInfo<?>>, DefaultSyntaxInfos {
 
 	/**
 	 * A priority for infos with patterns that only match simple text (they do not have any {@link Expression}s).
@@ -46,6 +47,13 @@ public interface SyntaxInfo<E extends SyntaxElement> extends DefaultSyntaxInfos 
 	static <E extends SyntaxElement> Builder<? extends Builder<?, E>, E> builder(Class<E> type) {
 		return new BuilderImpl<>(type);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Contract("-> new")
+	Builder<? extends Builder<?, E>, E> builder();
 
 	/**
 	 * @return The origin of this syntax.

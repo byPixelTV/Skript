@@ -36,6 +36,13 @@ public interface DefaultSyntaxInfos {
 		}
 
 		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@Contract("-> new")
+		Builder<? extends Builder<?, E, R>, E, R> builder();
+
+		/**
 		 * @return The class representing the supertype of all values the Expression may return.
 		 */
 		Class<R> returnType();
@@ -124,6 +131,13 @@ public interface DefaultSyntaxInfos {
 		static <E extends org.skriptlang.skript.lang.structure.Structure> Builder<? extends Builder<?, E>, E> builder(Class<E> structureClass) {
 			return new StructureImpl.BuilderImpl<>(structureClass);
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@Contract("-> new")
+		Builder<? extends Builder<?, E>, E> builder();
 
 		/**
 		 * @return The entry validator to use for handling the Structure's entries.

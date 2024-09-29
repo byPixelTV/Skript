@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfosImpl.EventImpl;
 import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxInfo.Builder;
 
 import java.util.Collection;
 
@@ -35,6 +36,13 @@ public final class BukkitSyntaxInfos {
 		) {
 			return new EventImpl.BuilderImpl<>(eventClass, name);
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@Contract("-> new")
+		Builder<? extends Builder<?, E>, E> builder();
 
 		/**
 		 * @return The listening behavior for the SkriptEvent. Determines when the event should trigger.

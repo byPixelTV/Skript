@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryValidator;
+import org.skriptlang.skript.registration.SyntaxInfo.Builder;
+import org.skriptlang.skript.registration.SyntaxInfoImpl.BuilderImpl;
 import org.skriptlang.skript.util.Priority;
 
 import java.util.Collection;
@@ -27,6 +29,14 @@ final class DefaultSyntaxInfosImpl {
 			super(origin, type, supplier, patterns, priority);
 			Preconditions.checkArgument(returnType != null, "An expression syntax info must have a return type.");
 			this.returnType = returnType;
+		}
+
+		@Override
+		public Expression.Builder<? extends Expression.Builder<?, E, R>, E, R> builder() {
+			var builder = new BuilderImpl<>(type());
+			super.builder().applyTo(builder);
+			builder.returnType(returnType);
+			return builder;
 		}
 
 		@Override
@@ -114,6 +124,17 @@ final class DefaultSyntaxInfosImpl {
 				throw new IllegalArgumentException("Simple Structures cannot have an EntryValidator");
 			this.entryValidator = entryValidator;
 			this.nodeType = nodeType;
+		}
+
+		@Override
+		public Structure.Builder<? extends Structure.Builder<?, E>, E> builder() {
+			var builder = new BuilderImpl<>(type());
+			super.builder().applyTo(builder);
+			if (entryValidator != null) {
+				builder.entryValidator(entryValidator);
+			}
+			builder.nodeType(nodeType);
+			return builder;
 		}
 
 		@Override

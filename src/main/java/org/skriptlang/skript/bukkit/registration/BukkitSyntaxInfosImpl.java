@@ -56,6 +56,26 @@ final class BukkitSyntaxInfosImpl {
 		}
 
 		@Override
+		public Builder<? extends Builder<?, E>, E> builder() {
+			var builder = new BuilderImpl<>(type(), name);
+			defaultInfo.builder().applyTo(builder);
+			builder.listeningBehavior(listeningBehavior);
+			builder.documentationId(id);
+			if (since != null) {
+				builder.since(since);
+			}
+			if (documentationId != null) {
+				builder.documentationId(documentationId);
+			}
+			builder.addDescription(description);
+			builder.addExamples(examples);
+			builder.addKeywords(keywords);
+			builder.addRequiredPlugins(requiredPlugins);
+			builder.addEvents(events);
+			return builder;
+		}
+
+		@Override
 		public ListeningBehavior listeningBehavior() {
 			return listeningBehavior;
 		}
