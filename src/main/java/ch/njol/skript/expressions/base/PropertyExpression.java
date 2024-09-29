@@ -19,7 +19,7 @@
 package ch.njol.skript.expressions.base;
 
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import org.jetbrains.annotations.ApiStatus;
