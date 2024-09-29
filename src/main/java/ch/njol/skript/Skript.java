@@ -1299,8 +1299,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		return addon;
 	}
 
-	@Nullable
-	public static SkriptAddon getAddon(JavaPlugin plugin) {
+	public static @Nullable SkriptAddon getAddon(JavaPlugin plugin) {
 		for (SkriptAddon addon : getAddons()) {
 			if (addon.plugin == plugin) {
 				return addon;
@@ -1309,8 +1308,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		return null;
 	}
 
-	@Nullable
-	public static SkriptAddon getAddon(String name) {
+	public static @Nullable SkriptAddon getAddon(String name) {
 		for (SkriptAddon addon : getAddons()) {
 			if (addon.getName().equals(name)) {
 				return addon;
@@ -1319,8 +1317,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		return null;
 	}
 
-	@Unmodifiable
-	public static Collection<SkriptAddon> getAddons() {
+	public static @Unmodifiable Collection<SkriptAddon> getAddons() {
 		Set<SkriptAddon> addons = new HashSet<>(Skript.addons);
 		addons.addAll(instance().addons().stream()
 			.filter(addon -> addons.stream().noneMatch(oldAddon -> oldAddon.name().equals(addon.name())))
@@ -1330,9 +1327,8 @@ public final class Skript extends JavaPlugin implements Listener {
 		return Collections.unmodifiableCollection(addons);
 	}
 
-	@Nullable
 	@Deprecated
-	private static SkriptAddon addon;
+	private static @Nullable SkriptAddon addon;
 
 	/**
 	 * @return A {@link SkriptAddon} representing Skript.
@@ -1427,36 +1423,32 @@ public final class Skript extends JavaPlugin implements Listener {
 		);
 	}
 
-	@Unmodifiable
-	public static Collection<SyntaxElementInfo<? extends Statement>> getStatements() {
+	public static @Unmodifiable Collection<SyntaxElementInfo<? extends Statement>> getStatements() {
 		return instance().syntaxRegistry()
 				.syntaxes(SyntaxRegistry.STATEMENT).stream()
 				.map(SyntaxElementInfo::<SyntaxElementInfo<Statement>, Statement>fromModern)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
-	@Unmodifiable
-	public static Collection<SyntaxElementInfo<? extends Condition>> getConditions() {
+	public static @Unmodifiable Collection<SyntaxElementInfo<? extends Condition>> getConditions() {
 		return instance().syntaxRegistry()
 				.syntaxes(SyntaxRegistry.CONDITION).stream()
 				.map(SyntaxElementInfo::<SyntaxElementInfo<Condition>, Condition>fromModern)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
-	@Unmodifiable
-	public static Collection<SyntaxElementInfo<? extends Effect>> getEffects() {
+	public static @Unmodifiable Collection<SyntaxElementInfo<? extends Effect>> getEffects() {
 		return instance().syntaxRegistry()
 				.syntaxes(SyntaxRegistry.EFFECT).stream()
 				.map(SyntaxElementInfo::<SyntaxElementInfo<Effect>, Effect>fromModern)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
-	@Unmodifiable
-	public static Collection<SyntaxElementInfo<? extends Section>> getSections() {
+	public static @Unmodifiable Collection<SyntaxElementInfo<? extends Section>> getSections() {
 		return instance().syntaxRegistry()
 				.syntaxes(SyntaxRegistry.SECTION).stream()
 				.map(SyntaxElementInfo::<SyntaxElementInfo<Section>, Section>fromModern)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	// ================ EXPRESSIONS ================
@@ -1486,21 +1478,19 @@ public final class Skript extends JavaPlugin implements Listener {
 	public static Iterator<ExpressionInfo<?, ?>> getExpressions() {
 		List<ExpressionInfo<?, ?>> list = new ArrayList<>();
 		for (SyntaxInfo.Expression<?, ?> info : instance().syntaxRegistry().syntaxes(SyntaxRegistry.EXPRESSION))
-			list.add(SyntaxElementInfo.<ExpressionInfo<Expression<?>, ?>, Expression<?>>fromModern(info));
+			list.add((ExpressionInfo<?, ?>) SyntaxElementInfo.fromModern(info));
 		return list.iterator();
 	}
 
 	public static Iterator<ExpressionInfo<?, ?>> getExpressions(Class<?>... returnTypes) {
-		return new CheckedIterator<>(getExpressions(), i -> {
-			if (i == null || i.returnType == Object.class)
+		return new CheckedIterator<>(getExpressions(), info -> {
+			if (info == null || info.returnType == Object.class)
 				return true;
-
-			for (final Class<?> returnType : returnTypes) {
+			for (Class<?> returnType : returnTypes) {
 				assert returnType != null;
-				if (Converters.converterExists(i.returnType, returnType))
+				if (Converters.converterExists(info.returnType, returnType))
 					return true;
 			}
-
 			return false;
 		});
 	}
@@ -1590,19 +1580,18 @@ public final class Skript extends JavaPlugin implements Listener {
 		);
 	}
 
-	@Unmodifiable
-	public static Collection<SkriptEventInfo<?>> getEvents() {
+	public static @Unmodifiable Collection<SkriptEventInfo<?>> getEvents() {
 		return instance().syntaxRegistry()
 				.syntaxes(BukkitRegistryKeys.EVENT).stream()
 				.map(SyntaxElementInfo::<SkriptEventInfo<SkriptEvent>, SkriptEvent>fromModern)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
-	public static List<StructureInfo<? extends Structure>> getStructures() {
+	public static @Unmodifiable List<StructureInfo<? extends Structure>> getStructures() {
 		return instance().syntaxRegistry()
 				.syntaxes(SyntaxRegistry.STRUCTURE).stream()
 				.map(SyntaxElementInfo::<StructureInfo<Structure>, Structure>fromModern)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	// ================ COMMANDS ================

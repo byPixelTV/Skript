@@ -39,7 +39,7 @@ import org.skriptlang.skript.util.Registry;
 /**
  * Utility class for Skript addons. Use {@link Skript#registerAddon(JavaPlugin)} to create a SkriptAddon instance for your plugin.
  */
-public class SkriptAddon implements org.skriptlang.skript.addon.SkriptAddon {
+public final class SkriptAddon implements org.skriptlang.skript.addon.SkriptAddon {
 
 	public final JavaPlugin plugin;
 	public final Version version;
