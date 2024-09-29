@@ -1528,24 +1528,8 @@ public final class Skript extends JavaPlugin implements Listener {
 		checkAcceptRegistrations();
 		for (int i = 0; i < patterns.length; i++)
 			patterns[i] = BukkitSyntaxInfos.fixPattern(patterns[i]);
-		SkriptEventInfo<E> legacy = new SkriptEventInfo<>(name, patterns, eventClass, "", events);
-		BukkitSyntaxInfos.Event.Builder<?, E> builder = BukkitSyntaxInfos.Event.builder(legacy.getElementClass(), name)
-				.origin(getSyntaxOrigin(JavaPlugin.getProvidingPlugin(legacy.getElementClass())))
-				.addPatterns(legacy.getPatterns())
-				.addEvents(legacy.events);
-		if (legacy.getSince() != null)
-			builder.since(legacy.getSince());
-		if (legacy.getDocumentationID() != null)
-			builder.documentationId(legacy.getDocumentationID());
-		if (legacy.getDescription() != null)
-			builder.addDescription(legacy.getDescription());
-		if (legacy.getExamples() != null)
-			builder.addExamples(legacy.getExamples());
-		if (legacy.getKeywords() != null)
-			builder.addKeywords(legacy.getKeywords());
-		if (legacy.getRequiredPlugins() != null)
-			builder.addRequiredPlugins(legacy.getRequiredPlugins());
-		skript.syntaxRegistry().register(BukkitRegistryKeys.EVENT, builder.build());
+		var legacy = new SkriptEventInfo.ModernSkriptEventInfo<>(name, patterns, eventClass, "", events);
+		skript.syntaxRegistry().register(BukkitRegistryKeys.EVENT, legacy);
 		return legacy;
 	}
 

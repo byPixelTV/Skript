@@ -85,9 +85,7 @@ public class SyntaxElementInfo<E extends SyntaxElement> {
 	@ApiStatus.Experimental
 	@SuppressWarnings("unchecked")
 	public static <I extends SyntaxElementInfo<E>, E extends SyntaxElement> I fromModern(SyntaxInfo<? extends E> info) {
-		if (info instanceof BukkitSyntaxInfos.Event) {
-			BukkitSyntaxInfos.Event<?> event = (BukkitSyntaxInfos.Event<?>) info;
-
+		if (info instanceof BukkitSyntaxInfos.Event<?> event) {
 			// We must first go back to the raw input
 			String rawName = event.name().startsWith("On ")
 					? event.name().substring(3)
@@ -109,12 +107,11 @@ public class SyntaxElementInfo<E extends SyntaxElement> {
 					.requiredPlugins(event.requiredPlugins().toArray(new String[0]));
 
 			return (I) eventInfo;
-		} else if (info instanceof SyntaxInfo.Structure) {
-			SyntaxInfo.Structure<?> structure = (SyntaxInfo.Structure<?>) info;
+		} else if (info instanceof SyntaxInfo.Structure<?> structure) {
 			return (I) new StructureInfo<>(structure.patterns().toArray(new String[0]), structure.type(),
 					structure.origin().name(), structure.entryValidator(), structure.nodeType());
-		} else if (info instanceof SyntaxInfo.Expression) {
-			return (I) fromModernExpression((SyntaxInfo.Expression<?, ?>) info);
+		} else if (info instanceof SyntaxInfo.Expression<?, ?> expression) {
+			return (I) fromModernExpression(expression);
 		}
 
 		return (I) new SyntaxElementInfo<>(info.patterns().toArray(new String[0]), info.type(), info.origin().name());
