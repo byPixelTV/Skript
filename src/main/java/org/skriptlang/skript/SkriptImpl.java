@@ -11,9 +11,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import org.skriptlang.skript.util.Registry;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -69,27 +68,26 @@ final class SkriptImpl implements Skript {
 	 * SkriptAddon Management
 	 */
 
-	private static final Set<SkriptAddon> addons = new HashSet<>();
+	private static final Map<String, SkriptAddon> addons = new HashMap<>();
 
 	@Override
 	public SkriptAddon registerAddon(Class<?> source, String name) {
 		// make sure an addon is not already registered with this name
-		for (SkriptAddon addon : addons) {
-			if (name.equals(addon.name())) {
-				throw new SkriptAPIException(
-					"An addon (provided by '" + addon.source().getName() + "') with the name '" + name + "' is already registered"
-				);
-			}
+		SkriptAddon existing = addons.get(name);
+		if (existing != null) {
+			throw new SkriptAPIException(
+				"An addon (provided by '" + existing.source().getName() + "') with the name '" + name + "' is already registered"
+			);
 		}
 
 		SkriptAddon addon = new SkriptAddonImpl(this, source, name, null);
-		addons.add(addon);
+		addons.put(name, addon);
 		return addon;
 	}
 
 	@Override
 	public @Unmodifiable Collection<SkriptAddon> addons() {
-		return ImmutableSet.copyOf(addons);
+		return ImmutableSet.copyOf(addons.values());
 	}
 
 	/*
