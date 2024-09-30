@@ -216,6 +216,10 @@ public sealed class SkriptEventInfo<E extends SkriptEvent> extends StructureInfo
 	 * Registration API Compatibility
 	 */
 
+	/**
+	 * Internal wrapper class for providing compatibility with the new Registration API.
+	 */
+	@ApiStatus.Internal
 	@ApiStatus.Experimental
 	public static final class ModernSkriptEventInfo<E extends SkriptEvent>
 			extends SkriptEventInfo<E>

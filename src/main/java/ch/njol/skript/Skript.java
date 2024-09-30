@@ -1300,6 +1300,9 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 
 	public static @Nullable SkriptAddon getAddon(JavaPlugin plugin) {
+		if (plugin == Skript.getInstance()) {
+			return Skript.getAddonInstance();
+		}
 		for (SkriptAddon addon : getAddons()) {
 			if (addon.plugin == plugin) {
 				return addon;
@@ -1309,6 +1312,9 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 
 	public static @Nullable SkriptAddon getAddon(String name) {
+		if (name.equals(Skript.getInstance().getName())) {
+			return Skript.getAddonInstance();
+		}
 		for (SkriptAddon addon : getAddons()) {
 			if (addon.getName().equals(name)) {
 				return addon;
