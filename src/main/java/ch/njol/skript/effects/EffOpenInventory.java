@@ -73,8 +73,7 @@ public class EffOpenInventory extends Effect {
 				"Opening a stone cutter inventory requires PaperSpigot."),
 		WORKBENCH("(crafting [table]|workbench)");
 
-		@Nullable
-		private String methodError;
+		private @Nullable String methodError;
 
 		@Nullable
 		private Version version;
@@ -174,8 +173,7 @@ public class EffOpenInventory extends Effect {
 	/**
 	 * Method because SecOpenInventory also uses this code block.
 	 */
-	@Nullable
-	public static Inventory createInventory(InventoryType type) {
+	public static @Nullable Inventory createInventory(InventoryType type) {
 		if (!type.isCreatable())
 			return null;
 		try {
