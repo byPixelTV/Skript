@@ -60,14 +60,11 @@ public class SecOpenInventory extends Section {
 		Skript.registerSection(SecOpenInventory.class, "[show|open|create] %inventory/inventorytype%  [to %players%]");
 	}
 
-	@Nullable
-	private Expression<?> inventory;
+	@Nullable private Expression<?> inventory;
 
-	@Nullable
-	private Expression<Player> players;
+	@Nullable private Expression<Player> players;
 
-	@Nullable
-	private Trigger trigger;
+	@Nullable private Trigger trigger;
 
 	@Override
 	@SuppressWarnings("unchecked")
