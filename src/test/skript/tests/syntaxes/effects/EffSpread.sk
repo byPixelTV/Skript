@@ -75,6 +75,16 @@ test "EffSpread - spreading 10":
 	assert {_2} is 2 with "Spread to {_2} failed"
 	assert {_3} is not set with "Spread to {_3} occurred when only two objects were available"
 
+test "EffSpread - spreading 11":
+	set {_v::1} to vector(0,1,0)
+	set {_v::2} to vector(0,1,0)
+	set {_v::3} to vector(0,1,0)
+
+	spread 1, 2 and 3 across (vector length of {_v::1}), (vector length of {_v::2}), and (vector length of {_v::3})
+	assert {_v::1} is vector(0,1,0) with "Incorrect spread to vector length 1"
+	assert {_v::2} is vector(0,2,0) with "Incorrect spread to vector length 2"
+	assert {_v::3} is vector(0,3,0) with "Incorrect spread to vector length 3"
+
 test "EffSpread - parse errors":
   parse:
     spread 1, 2 and 3 across dirt and dirt
@@ -88,3 +98,6 @@ test "EffSpread - parse errors":
   parse:
     spread 1 across {_a::*}
   assert parse logs contain "You must provide more than one object to spread" with "A single expression was allowed as the objects to spread"
+  parse:
+    spread 1, "a" and a frog across (vector length of {_v::1}), (vector length of {_v::2}), and (vector length of {_v::3})
+  assert parse logs contain "All expressions in the spread target list must be settable" with "A source of the wrong type was able to spread to the targets."
