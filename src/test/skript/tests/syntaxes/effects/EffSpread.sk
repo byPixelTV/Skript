@@ -85,6 +85,14 @@ test "EffSpread - spreading 11":
 	assert {_v::2} is vector(0,2,0) with "Incorrect spread to vector length 2"
 	assert {_v::3} is vector(0,3,0) with "Incorrect spread to vector length 3"
 
+	set {_1} to 3
+	set {_2} to 1
+	set {_3} to 2
+	spread {_1}, {_2} and {_3} across (vector length of {_v::1}), (vector length of {_v::2}), and (vector length of {_v::3})
+	assert {_v::1} is vector(0,3,0) with "Incorrect spread to vector length 4"
+	assert {_v::2} is vector(0,1,0) with "Incorrect spread to vector length 5"
+	assert {_v::3} is vector(0,2,0) with "Incorrect spread to vector length 6"
+
 test "EffSpread - parse errors":
   parse:
     spread 1, 2 and 3 across dirt and dirt
