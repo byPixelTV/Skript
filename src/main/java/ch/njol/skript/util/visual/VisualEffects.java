@@ -39,7 +39,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,8 +151,11 @@ public class VisualEffects {
 				}
 				if (raw == null)
 					return Bukkit.createBlockData(Material.AIR);
-				if (raw instanceof ItemType)
-					return Bukkit.createBlockData(((ItemType) raw).getRandom().getType());
+				if (raw instanceof ItemType) {
+					ItemType type = (ItemType) raw;
+					ItemStack random = type.getRandom();
+					return Bukkit.createBlockData(random != null ? random.getType() : type.getMaterial());
+				}
 				return raw;
 			};
 			registerDataSupplier("Particle.BLOCK", blockDataSupplier);
