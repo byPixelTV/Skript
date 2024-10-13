@@ -9,8 +9,11 @@ test "metadata value":
 		remove 3 from metadata "number" of entity
 		assert metadata "number" of entity is 12 with "didn't remove from metadata value"
 
-		add "number" to metadata "number" of entity
+		add "not a number" to metadata "number" of entity
 		assert metadata "number" of entity is 12 with "added incompatible type to metadata"
+
+		remove "not a number" from metadata "number" of entity
+		assert metadata "number" of entity is 12 with "removed incompatible type from metadata"
 
 		add vector(1, 0, 1) to metadata "vector" of entity
 		assert metadata "vector" of entity is vector(1, 0, 1) with "didn't add to unset metadata value"

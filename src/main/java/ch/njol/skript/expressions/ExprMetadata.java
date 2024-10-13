@@ -116,21 +116,21 @@ public class ExprMetadata<T> extends SimpleExpression<T> {
 						assert delta != null;
 						Operator operator = mode == ChangeMode.ADD ? Operator.ADDITION : Operator.SUBTRACTION;
 						List<MetadataValue> metadata = holder.getMetadata(key);
-						Object value;
+						Object value = metadata.isEmpty() ? null : metadata.get(metadata.size() - 1).value();
 						OperationInfo<?, ?, ?> info;
-						if (metadata.isEmpty() || (value = metadata.get(metadata.size() - 1).value()) == null) {
-							info = Arithmetics.getOperationInfo(operator, delta[0].getClass(), delta[0].getClass());
-							if (info == null)
-								continue;
-							value = Arithmetics.getDefaultValue(info.getLeft());
-							if (value == null)
-								continue;
-						} else {
-							info = Arithmetics.getOperationInfo(operator, value.getClass(), delta[0].getClass());
-							if (info == null)
-								continue;
-						}
-						//noinspection unchecked,rawtypes
+                        if (value != null) {
+                            info = Arithmetics.getOperationInfo(operator, value.getClass(), delta[0].getClass());
+                            if (info == null)
+                                continue;
+                        } else {
+                            info = Arithmetics.getOperationInfo(operator, delta[0].getClass(), delta[0].getClass());
+                            if (info == null)
+                                continue;
+                            value = Arithmetics.getDefaultValue(info.getLeft());
+                            if (value == null)
+                                continue;
+                        }
+                        //noinspection unchecked,rawtypes
 						Object newValue = ((Operation) info.getOperation()).calculate(value, delta[0]);
 						holder.setMetadata(key, new FixedMetadataValue(Skript.getInstance(), newValue));
 					}
