@@ -11,6 +11,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionList;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.DefaultClasses;
 import ch.njol.skript.util.ClassInfoReference;
 import ch.njol.skript.util.LiteralUtils;
@@ -53,9 +54,13 @@ public class EffSpread extends Effect {
 			Skript.error("The spread target must be an 'and' list, not an 'or' list");
 			return false;
 		}
+		Expression<?> convertedObjectsToSpread = objectsToSpread.getConvertedExpression(spreadTarget.getReturnType());
+		if (convertedObjectsToSpread != null)
+			objectsToSpread = convertedObjectsToSpread;
 		ClassInfoReference spreadType = new ClassInfoReference(objectsToSpread.getReturnType(), Kleenean.FALSE);
 		if (!listChildrenCanBeSet(spreadTarget, spreadType)) {
-			Skript.error("All expressions in the spread target list must be settable");
+			String friendlySpreadType = Classes.toString(spreadType.getClassInfo());
+			Skript.error("All expressions in the spread target list must be settable to at least one " + friendlySpreadType);
 			return false;
 		}
 		return LiteralUtils.canInitSafely(objectsToSpread, spreadTarget);
