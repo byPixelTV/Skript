@@ -371,8 +371,13 @@ public class SkriptParser {
 					for (Class<? extends T> type : types) {
 						// Check return type against everything that expression accepts
 						if (parsedExpression.canReturn(type)) {
-							log.printLog();
-							return (Expression<? extends T>) parsedExpression;
+							Expression<? extends T> convertedExpression = parsedExpression.getConvertedExpression(type);
+							if (convertedExpression != null) {
+								log.printLog();
+								return convertedExpression;
+							}
+							log.printError(parsedExpression.toString(null, false) + " " + Language.get("is") + " " + notOfType(type), ErrorQuality.NOT_AN_EXPRESSION);
+							return null;
 						}
 					}
 
@@ -556,8 +561,13 @@ public class SkriptParser {
 								return null;
 							}
 
-							log.printLog();
-							return parsedExpression;
+							Expression<?> convertedExpression = parsedExpression.getConvertedExpression(type);
+							if (convertedExpression != null) {
+								log.printLog();
+								return convertedExpression;
+							}
+							log.printError(parsedExpression.toString(null, false) + " " + Language.get("is") + " " + notOfType(type), ErrorQuality.NOT_AN_EXPRESSION);
+							return null;
 						}
 					}
 
