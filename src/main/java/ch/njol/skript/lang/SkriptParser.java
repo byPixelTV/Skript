@@ -326,7 +326,6 @@ public class SkriptParser {
 		}
 	}
 
-
 	@Nullable
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private <T> Expression<? extends T> parseSingleExpr(boolean allowUnparsedLiteral, @Nullable LogEntry error, Class<? extends T>... types) {
@@ -370,27 +369,12 @@ public class SkriptParser {
 				if (parsedExpression != null) { // Expression/VariableString parsing success
 					for (Class<? extends T> type : types) {
 						// Check return type against everything that expression accepts
-						if (parsedExpression.canReturn(type)) {
-							Expression<? extends T> convertedExpression = parsedExpression.getConvertedExpression(type);
-							if (convertedExpression != null) {
-								log.printLog();
-								return convertedExpression;
-							}
-							log.printError(parsedExpression.toString(null, false) + " " + Language.get("is") + " " + notOfType(type), ErrorQuality.NOT_AN_EXPRESSION);
-							return null;
-						}
+						if (parsedExpression.canReturn(type))
+							return convertExpression(parsedExpression, log, type);
 					}
 
 					// No directly same type found
-					Class<T>[] objTypes = (Class<T>[]) types; // Java generics... ?
-					Expression<? extends T> convertedExpression = parsedExpression.getConvertedExpression(objTypes);
-					if (convertedExpression != null) {
-						log.printLog();
-						return convertedExpression;
-					}
-					// Print errors, if we couldn't get the correct type
-					log.printError(parsedExpression.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
-					return null;
+					return convertExpression(parsedExpression, log, (Class<T>[]) types);
 				}
 				log.clear();
 			}
@@ -561,13 +545,7 @@ public class SkriptParser {
 								return null;
 							}
 
-							Expression<?> convertedExpression = parsedExpression.getConvertedExpression(type);
-							if (convertedExpression != null) {
-								log.printLog();
-								return convertedExpression;
-							}
-							log.printError(parsedExpression.toString(null, false) + " " + Language.get("is") + " " + notOfType(type), ErrorQuality.NOT_AN_EXPRESSION);
-							return null;
+							return convertExpression(parsedExpression, log, type);
 						}
 					}
 
@@ -576,16 +554,8 @@ public class SkriptParser {
 						return null;
 					}
 
-					// No directly same type found
-					Expression<?> convertedExpression = parsedExpression.getConvertedExpression((Class<Object>[]) types);
-					if (convertedExpression != null) {
-						log.printLog();
-						return convertedExpression;
-					}
-
-					// Print errors, if we couldn't get the correct type
-					log.printError(parsedExpression.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
-					return null;
+					//noinspection unchecked
+					return convertExpression(parsedExpression, log, (Class<Object>[]) types);
 				}
 				log.clear();
 			}
@@ -627,6 +597,17 @@ public class SkriptParser {
 		} finally {
 			log.stop();
 		}
+	}
+
+	@SafeVarargs
+	private static <T> Expression<? extends T> convertExpression(Expression<?> expression, ParseLogHandler log, Class<T>... types) {
+		Expression<? extends T> convertedExpression = expression.getConvertedExpression(types);
+		if (convertedExpression != null) {
+			log.printLog();
+			return convertedExpression;
+		}
+		log.printError(expression.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
+		return null;
 	}
 
 	/**
