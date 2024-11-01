@@ -49,7 +49,7 @@ import ch.njol.util.Kleenean;
 		"set {_chances::*} to 5 random integers between 5 and 96",
 		"set {_decimals::*} to 3 random numbers between 2.7 and -1.5"
 })
-@Since("1.4, INSERT VERSION (Multiple random numbers)")
+@Since("1.4, 2.10.0 (Multiple random numbers)")
 public class ExprRandomNumber extends SimpleExpression<Number> {
 
 	static {

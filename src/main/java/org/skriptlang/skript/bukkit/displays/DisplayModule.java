@@ -28,7 +28,7 @@ public class DisplayModule {
 			.user("displays?")
 			.name("Display Entity")
 			.description("A text, block or item display entity.")
-			.since("INSERT VERSION")
+			.since("2.10.0")
 			.defaultExpression(new EventValueExpression<>(Display.class))
 			.changer(DefaultChangers.nonLivingEntityChanger));
 
@@ -36,19 +36,19 @@ public class DisplayModule {
 			.user("billboards?")
 			.name("Display Billboard")
 			.description("Represents the billboard setting of a display.")
-			.since("INSERT VERSION"));
+			.since("2.10.0"));
 
 		Classes.registerClass(new EnumClassInfo<>(TextDisplay.TextAlignment.class, "textalignment", "text alignments")
 			.user("text ?alignments?")
 			.name("Display Text Alignment")
 			.description("Represents the text alignment setting of a text display.")
-			.since("INSERT VERSION"));
+			.since("2.10.0"));
 
 		Classes.registerClass(new EnumClassInfo<>(ItemDisplay.ItemDisplayTransform.class, "itemdisplaytransform", "item display transforms")
 			.user("item ?display ?transforms?")
 			.name("Item Display Transforms")
 			.description("Represents the transform setting of an item display.")
-			.since("INSERT VERSION"));
+			.since("2.10.0"));
 	}
 
 }

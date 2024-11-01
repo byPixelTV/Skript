@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 		"\tbreeding father is a cow",
 		"\tset dropped experience to 10"
 })
-@Since("2.1, 2.5.3 (block break event), 2.7 (experience change event), INSERT VERSION (breeding event)")
+@Since("2.1, 2.5.3 (block break event), 2.7 (experience change event), 2.10.0 (breeding event)")
 @Events({"experience spawn", "break / mine", "experience change", "entity breeding"})
 public class ExprExperience extends SimpleExpression<Experience> {
 

@@ -1534,7 +1534,7 @@ public class BukkitClasses {
 				.user("(entity )?potion ?effect ?cause")
 				.name("Entity Potion Cause")
 				.description("Represents the cause of the action of a potion effect on an entity, e.g. arrow, command")
-				.since("INSERT VERSION"));
+				.since("2.10.0"));
 
 		ClassInfo<?> wolfVariantClassInfo;
 		if (Skript.classExists("org.bukkit.entity.Wolf$Variant") && BukkitUtils.registryExists("WOLF_VARIANT")) {
@@ -1558,7 +1558,7 @@ public class BukkitClasses {
 			.user("(experience|[e]xp) cooldown change (reason|cause)s?")
 			.name("Experience Cooldown Change Reason")
 			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
-			.since("INSERT VERSION"));
+			.since("2.10.0"));
 	}
 
 }

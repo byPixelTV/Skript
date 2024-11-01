@@ -25,7 +25,7 @@ public class BreedingModule {
 				"on love mode enter:",
 					"\tcancel event # No one is allowed love here"
 			)
-			.since("INSERT VERSION");
+			.since("2.10.0");
 
 		EventValues.registerEventValue(EntityBreedEvent.class, ItemStack.class, new Getter<>() {
 			@Override

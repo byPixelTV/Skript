@@ -764,7 +764,7 @@ public class SimpleEvents {
 					"\t\tsend \"Diamonds belong in the money pit!\" to player",
 					"\t\tcancel event"
 				)
-				.since("INSERT VERSION");
+				.since("2.10.0");
 		}
 		{
 			final Class<? extends Event> eventClass;
@@ -829,7 +829,7 @@ public class SimpleEvents {
 				"on broadcast:",
 					"\tset broadcast-message to \"&c[BROADCAST] %broadcasted message%\""
 			)
-			.since("INSERT VERSION");
+			.since("2.10.0");
 
 		Skript.registerEvent("Experience Cooldown Change", SimpleEvent.class, PlayerExpCooldownChangeEvent.class, "player (experience|[e]xp) cooldown change")
 			.description(
@@ -843,7 +843,7 @@ public class SimpleEvents {
 					"\tbroadcast past event-timespan",
 					"\tbroadcast xp cooldown change reason"
 			)
-			.since("INSERT VERSION");
+			.since("2.10.0");
 
 	}
 }

@@ -40,7 +40,7 @@ public class EvtEntityPotion extends SkriptEvent {
 					"\t\tbroadcast \"A potion effect was added to %event-entity%!\" ",
 				"",
 				"on entity potion effect modification of night vision:")
-			.since("INSERT VERSION");
+			.since("2.10.0");
 	}
 
 	@SuppressWarnings("unchecked")

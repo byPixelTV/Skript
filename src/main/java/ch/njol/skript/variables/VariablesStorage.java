@@ -18,14 +18,6 @@
  */
 package ch.njol.skript.variables;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import org.jetbrains.annotations.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
@@ -37,6 +29,14 @@ import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.variables.SerializedVariable.Value;
 import ch.njol.util.Closeable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * A variable storage is holds the means and methods of storing variables.
@@ -149,9 +149,28 @@ public abstract class VariablesStorage implements Closeable {
 	 */
 	@Nullable
 	protected <T> T getValue(SectionNode sectionNode, String key, Class<T> type) {
+		return getValue(sectionNode, key, type, null);
+	}
+
+	/**
+	 * Gets the value at the given key of the given section node,
+	 * parsed with the given type, or returns the default value if the key doesn't exist.
+	 *
+	 * @param sectionNode the section node.
+	 * @param key the key.
+	 * @param type the type.
+	 * @param defaultValue the default value to use if the key was not found.
+	 * @return the parsed value, or {@code null} if the value was invalid,
+	 * or not found.
+	 * @param <T> the type.
+	 */
+	@Nullable
+	protected <T> T getValue(@NotNull SectionNode sectionNode, String key, Class<T> type, @Nullable T defaultValue) {
 		String rawValue = sectionNode.getValue(key);
 		// Section node doesn't have this key
 		if (rawValue == null) {
+			if (defaultValue != null)
+				return defaultValue;
 			Skript.error("The config is missing the entry for '" + key + "' in the database '" + databaseName + "'");
 			return null;
 		}
@@ -225,7 +244,7 @@ public abstract class VariablesStorage implements Closeable {
 			// Set the backup interval, if present & enabled
 			if (!"0".equals(getValue(sectionNode, "backup interval"))) {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
-				int toKeep = getValue(sectionNode, "backups to keep", Integer.class);
+				int toKeep = getValue(sectionNode, "backups to keep", Integer.class, -1);
 				boolean removeBackups = false;
 				boolean startBackup = true;
 				if (backupInterval != null)

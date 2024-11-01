@@ -317,6 +317,8 @@ databases:
 		monitor changes: true
 		monitor interval: 20 seconds
 
+		backups to keep: -1
+
 	SQLite example:
 		# An SQLite database example.
 

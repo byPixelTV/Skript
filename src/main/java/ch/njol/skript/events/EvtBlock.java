@@ -93,7 +93,7 @@ public class EvtBlock extends SkriptEvent {
 					"\tbroadcast event-entities",
 				"on block drop of oak log:"
 			)
-			.since("INSERT VERSION");
+			.since("2.10.0");
 	}
 	
 	@Nullable
