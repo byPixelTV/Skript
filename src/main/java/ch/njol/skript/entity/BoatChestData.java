@@ -79,6 +79,8 @@ public class BoatChestData extends EntityData<ChestBoat> {
 
 	@Override
 	public void set(ChestBoat entity) {
+		if (IS_RUNNING_1_21_3)
+			return;
 		if (matchedPattern == 1) // If the type is 'any boat'.
 			matchedPattern += new Random().nextInt(Boat.Type.values().length); // It will spawn a random boat type in case is 'any boat'.
 		if (matchedPattern > 1) // 0 and 1 are excluded

@@ -1,17 +1,25 @@
 package ch.njol.skript.entity;
 
-import java.util.EnumMap;
-import java.util.Locale;
-import java.util.Random;
-
 import ch.njol.skript.Skript;
-import org.bukkit.Material;
-import org.bukkit.entity.Boat;
-import org.bukkit.entity.boat.*;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import org.bukkit.Material;
+import org.bukkit.entity.Boat;
+import org.bukkit.entity.boat.AcaciaBoat;
+import org.bukkit.entity.boat.BambooRaft;
+import org.bukkit.entity.boat.BirchBoat;
+import org.bukkit.entity.boat.CherryBoat;
+import org.bukkit.entity.boat.DarkOakBoat;
+import org.bukkit.entity.boat.JungleBoat;
+import org.bukkit.entity.boat.MangroveBoat;
+import org.bukkit.entity.boat.OakBoat;
+import org.bukkit.entity.boat.SpruceBoat;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Random;
 
 public class BoatData extends EntityData<Boat> {
 
@@ -78,6 +86,8 @@ public class BoatData extends EntityData<Boat> {
 
 	@Override
 	public void set(Boat entity) {
+		if (IS_RUNNING_1_21_3)
+			return;
 		if (matchedPattern == 1) // If the type is 'any boat'.
 			matchedPattern += new Random().nextInt(Boat.Type.values().length); // It will spawn a random boat type in case is 'any boat'.
 		if (matchedPattern > 1) // 0 and 1 are excluded
