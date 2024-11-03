@@ -18,9 +18,10 @@ public class EvtPlayerInput extends SkriptEvent {
 			Skript.registerEvent("Player Input", EvtPlayerInput.class, PlayerInputEvent.class,
 					"[player] (toggle|toggling|1:press[ing]|2:releas(e|ing)) [of] (%-inputkeys%|[a|any] key)",
 					"([player] %-inputkeys%|[a|any] [player] key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
-				.description("Called when a player sends an updated input to the server.")
+				.description("Called when a player sends an updated input to the server.",
+					"Note: The input keys event value is the set of keys the player is currently pressing, not the keys that were pressed or released.")
 				.examples("on player press any key:",
-					"\tsend \"You are pressing: %event-inputs%\" to player")
+					"\tsend \"You are pressing: %event-inputkeys%\" to player")
 				.since("INSERT VERSION")
 				.requiredPlugins("Minecraft 1.21.3+");
 		}
