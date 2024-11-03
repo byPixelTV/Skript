@@ -21,7 +21,8 @@ public class EvtPlayerInput extends SkriptEvent {
 				.description("Called when a player sends an updated input to the server.")
 				.examples("on player input:",
 					"\tsend \"You are pressing: %event-inputs%\" to player")
-				.since("INSERT VERSION");
+				.since("INSERT VERSION")
+				.requiredPlugins("Minecraft 1.21.3+");
 		}
 	}
 

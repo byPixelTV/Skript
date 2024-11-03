@@ -1,10 +1,7 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -23,6 +20,7 @@ import java.util.List;
 @Description("Get the current input keys of a player.")
 @Examples("broadcast \"%player% is pressing %current input keys of player%\"")
 @Since("INSERT VERSION")
+@RequiredPlugins("Minecraft 1.21.3+")
 public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 
 	static {

@@ -23,6 +23,7 @@ import org.skriptlang.skript.bukkit.InputKey;
 })
 @Since("INSERT VERSION")
 @Keywords({"press", "input"})
+@RequiredPlugins("Minecraft 1.21.3+")
 public class CondIsPressingKey extends Condition {
 
 	static {
