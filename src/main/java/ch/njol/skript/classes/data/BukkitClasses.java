@@ -98,6 +98,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.CachedServerIcon;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.InputKey;
 
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
@@ -1559,6 +1560,14 @@ public class BukkitClasses {
 			.name("Experience Cooldown Change Reason")
 			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
 			.since("INSERT VERSION"));
+
+		if (Skript.classExists("org.bukkit.Input")) {
+			Classes.registerClass(new EnumClassInfo<>(InputKey.class, "inputkey", "input keys")
+				.user("input ?keys?")
+				.name("Input Key")
+				.description("Represents a movement input key that is pressed by a player")
+				.since("INSERT VERSION"));
+		}
 	}
 
 }

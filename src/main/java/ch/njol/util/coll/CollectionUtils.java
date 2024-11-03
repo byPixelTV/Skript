@@ -19,20 +19,13 @@
 package ch.njol.util.coll;
 
 import ch.njol.util.Pair;
-import org.jetbrains.annotations.NotNull;
+import ch.njol.util.Predicate;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * Utils for collections and arrays. All methods will not print any errors for <tt>null</tt> collections/arrays, but will return false/-1/etc.
@@ -101,6 +94,20 @@ public abstract class CollectionUtils {
 				return false;
 		}
 		return true;
+	}
+	
+	public static <T> boolean check(T @Nullable [] array, Predicate<@UnknownNullability T> predicate, boolean and) {
+		if (array == null)
+			return false;
+		for (T value : array) {
+			boolean result = predicate.test(value);
+			// exit early if we find a FALSE and we're ANDing, or a TRUE and we're ORing
+			if (and && !result)
+				return false;
+			if (!and && result)
+				return true;
+		}
+		return and;
 	}
 	
 	public static int indexOf(final @Nullable int[] array, final int num) {
