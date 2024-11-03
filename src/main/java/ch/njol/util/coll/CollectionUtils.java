@@ -19,13 +19,13 @@
 package ch.njol.util.coll;
 
 import ch.njol.util.Pair;
-import ch.njol.util.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 /**
  * Utils for collections and arrays. All methods will not print any errors for <tt>null</tt> collections/arrays, but will return false/-1/etc.
@@ -96,7 +96,7 @@ public abstract class CollectionUtils {
 		return true;
 	}
 	
-	public static <T> boolean check(T @Nullable [] array, Predicate<@UnknownNullability T> predicate, boolean and) {
+	public static <T> boolean check(T @Nullable [] array, Predicate<T> predicate, boolean and) {
 		if (array == null)
 			return false;
 		for (T value : array) {

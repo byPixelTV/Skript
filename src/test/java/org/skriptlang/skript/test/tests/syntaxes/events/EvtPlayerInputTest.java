@@ -33,12 +33,11 @@ public class EvtPlayerInputTest extends SkriptJUnitTest {
 	public void test() {
 		if (!SUPPORTS_INPUT)
 			return;
-		PluginManager pluginManager = Bukkit.getPluginManager();
 		Input pastInput = fromKeys(InputKey.FORWARD);
 		Input futureInput = fromKeys(InputKey.FORWARD, InputKey.JUMP);
 		EasyMock.expect(player.getCurrentInput()).andStubReturn(pastInput);
 		EasyMock.replay(player);
-		pluginManager.callEvent(new PlayerInputEvent(player, futureInput));
+		Bukkit.getPluginManager().callEvent(new PlayerInputEvent(player, futureInput));
 		EasyMock.verify(player);
 	}
 

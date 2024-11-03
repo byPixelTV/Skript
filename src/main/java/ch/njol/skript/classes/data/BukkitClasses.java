@@ -1565,8 +1565,9 @@ public class BukkitClasses {
 			Classes.registerClass(new EnumClassInfo<>(InputKey.class, "inputkey", "input keys")
 				.user("input ?keys?")
 				.name("Input Key")
-				.description("Represents a movement input key that is pressed by a player")
-				.since("INSERT VERSION"));
+				.description("Represents a movement input key that is pressed by a player.")
+				.since("INSERT VERSION")
+				.requiredPlugins("Minecraft 1.21.3+"));
 		}
 	}
 

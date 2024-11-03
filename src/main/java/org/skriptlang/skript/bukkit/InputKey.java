@@ -21,7 +21,7 @@ public enum InputKey {
 		this.toString = toString;
 	}
 
-	public boolean check(org.bukkit.Input input) {
+	public boolean check(Input input) {
 		return switch (this) {
 			case FORWARD -> input.isForward();
 			case BACKWARD -> input.isBackward();

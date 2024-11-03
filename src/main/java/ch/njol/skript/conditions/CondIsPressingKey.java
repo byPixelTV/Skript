@@ -49,7 +49,7 @@ public class CondIsPressingKey extends Condition {
 		inputKeys = (Expression<InputKey>) expressions[1];
 		past = matchedPattern > 1;
 		if (past && !getParser().isCurrentEvent(PlayerInputEvent.class))
-			Skript.warning("Checking for the past state outside of a 'player input' event is useless.");
+			Skript.warning("Checking the past state of a player's input outside the 'player input' event has no effect.");
 		setNegated(matchedPattern == 1 || matchedPattern == 3);
 		return true;
 	}
