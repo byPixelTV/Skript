@@ -98,7 +98,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.CachedServerIcon;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.input.InputKey;
 
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
