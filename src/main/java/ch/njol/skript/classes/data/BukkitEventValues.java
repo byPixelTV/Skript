@@ -49,7 +49,14 @@ import io.papermc.paper.event.player.PlayerStopUsingItemEvent;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
 import io.papermc.paper.event.player.PlayerTradeEvent;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
+import org.bukkit.Keyed;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -154,7 +161,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.InputKey;
+import org.skriptlang.skript.bukkit.input.InputKey;
 
 @SuppressWarnings("deprecation")
 public final class BukkitEventValues {
@@ -1978,21 +1985,5 @@ public final class BukkitEventValues {
 				return new Timespan(Timespan.TimePeriod.TICK, event.getPlayer().getExpCooldown());
 			}
 		}, EventValues.TIME_PAST);
-
-		// PlayerInputEvent
-		if (Skript.classExists("org.bukkit.Input")) {
-			EventValues.registerEventValue(PlayerInputEvent.class, InputKey[].class, new Getter<>() {
-                @Override
-                public InputKey[] get(PlayerInputEvent event) {
-                    return InputKey.fromInput(event.getInput()).toArray(new InputKey[0]);
-                }
-            }, EventValues.TIME_NOW);
-			EventValues.registerEventValue(PlayerInputEvent.class, InputKey[].class, new Getter<>() {
-                @Override
-                public InputKey[] get(PlayerInputEvent event) {
-                    return InputKey.fromInput(event.getPlayer().getCurrentInput()).toArray(new InputKey[0]);
-                }
-            }, EventValues.TIME_PAST);
-		}
 	}
 }

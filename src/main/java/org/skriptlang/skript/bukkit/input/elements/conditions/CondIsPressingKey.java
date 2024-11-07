@@ -1,4 +1,4 @@
-package ch.njol.skript.conditions;
+package org.skriptlang.skript.bukkit.input.elements.conditions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.InputKey;
+import org.skriptlang.skript.bukkit.input.InputKey;
 
 @Name("Is Pressing Key")
 @Description("Checks if a player is pressing a certain input key.")
@@ -27,14 +27,12 @@ import org.skriptlang.skript.bukkit.InputKey;
 public class CondIsPressingKey extends Condition {
 
 	static {
-		if (Skript.classExists("org.bukkit.Input")) {
-			Skript.registerCondition(CondIsPressingKey.class,
-				"%players% (is|are) pressing %inputkeys%",
-				"%players% (isn't|is not|aren't|are not) pressing %inputkeys%",
-				"%players% (was|were) pressing %inputkeys%",
-				"%players% (wasn't|was not|weren't|were not) pressing %inputkeys%"
-			);
-		}
+		Skript.registerCondition(CondIsPressingKey.class,
+			"%players% (is|are) pressing %inputkeys%",
+			"%players% (isn't|is not|aren't|are not) pressing %inputkeys%",
+			"%players% (was|were) pressing %inputkeys%",
+			"%players% (wasn't|was not|weren't|were not) pressing %inputkeys%"
+		);
 	}
 
 	private Expression<Player> players;
@@ -79,7 +77,8 @@ public class CondIsPressingKey extends Condition {
 		} else {
 			builder.append(players.isSingle() ? " is " : " are ");
 		}
-		builder.append(isNegated() ? "not " : "");
+		if (isNegated())
+			builder.append("not ");
 		builder.append("pressing ");
 		builder.append(inputKeys.toString(event, debug));
 		return builder.toString();

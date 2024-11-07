@@ -1,4 +1,4 @@
-package ch.njol.skript.expressions;
+package org.skriptlang.skript.bukkit.input.elements.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.InputKey;
+import org.skriptlang.skript.bukkit.input.InputKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,7 @@ import java.util.List;
 public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 
 	static {
-		if (Skript.classExists("org.bukkit.Input"))
-			register(ExprCurrentInputKeys.class, InputKey.class, "[current] (inputs|input keys)", "players");
+		register(ExprCurrentInputKeys.class, InputKey.class, "[current] (inputs|input keys)", "players");
 	}
 
 	@Override
@@ -65,7 +64,7 @@ public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "current input keys of " + getExpr().toString(event, debug);
+		return "the current input keys of " + getExpr().toString(event, debug);
 	}
 
 }

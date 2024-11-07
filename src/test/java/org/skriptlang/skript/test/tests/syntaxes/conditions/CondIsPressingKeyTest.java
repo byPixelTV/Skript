@@ -11,7 +11,7 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.skriptlang.skript.bukkit.InputKey;
+import org.skriptlang.skript.bukkit.input.InputKey;
 
 public class CondIsPressingKeyTest extends SkriptJUnitTest {
 
@@ -75,13 +75,13 @@ public class CondIsPressingKeyTest extends SkriptJUnitTest {
 		Input input = EasyMock.niceMock(Input.class);
 		for (InputKey key : keys) {
 			switch (key) {
-                case FORWARD -> EasyMock.expect(input.isForward()).andReturn(true);
-                case BACKWARD -> EasyMock.expect(input.isBackward()).andReturn(true);
-                case RIGHT -> EasyMock.expect(input.isRight()).andReturn(true);
-                case LEFT -> EasyMock.expect(input.isLeft()).andReturn(true);
-                case JUMP -> EasyMock.expect(input.isJump()).andReturn(true);
-                case SNEAK -> EasyMock.expect(input.isSneak()).andReturn(true);
-                case SPRINT -> EasyMock.expect(input.isSprint()).andReturn(true);
+				case FORWARD -> EasyMock.expect(input.isForward()).andReturn(true);
+				case BACKWARD -> EasyMock.expect(input.isBackward()).andReturn(true);
+				case RIGHT -> EasyMock.expect(input.isRight()).andReturn(true);
+				case LEFT -> EasyMock.expect(input.isLeft()).andReturn(true);
+				case JUMP -> EasyMock.expect(input.isJump()).andReturn(true);
+				case SNEAK -> EasyMock.expect(input.isSneak()).andReturn(true);
+				case SPRINT -> EasyMock.expect(input.isSprint()).andReturn(true);
             }
 		}
 		EasyMock.replay(input);

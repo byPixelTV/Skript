@@ -6,11 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Input;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInputEvent;
-import org.bukkit.plugin.PluginManager;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.skriptlang.skript.bukkit.InputKey;
+import org.skriptlang.skript.bukkit.input.InputKey;
 
 public class EvtPlayerInputTest extends SkriptJUnitTest {
 

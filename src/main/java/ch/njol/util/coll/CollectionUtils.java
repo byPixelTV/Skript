@@ -95,7 +95,16 @@ public abstract class CollectionUtils {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Checks the elements of an array against a given predicate.
+	 *
+	 * @param array the array to check, can be null
+	 * @param predicate the predicate to test the elements against
+	 * @param and if true, all elements must satisfy the predicate; if false, any element satisfying the predicate is enough
+	 * @param <T> the type of elements in the array
+	 * @return true if the condition is met based on the value of the 'and' parameter, false otherwise
+	 */
 	public static <T> boolean check(T @Nullable [] array, Predicate<T> predicate, boolean and) {
 		if (array == null)
 			return false;
@@ -109,7 +118,7 @@ public abstract class CollectionUtils {
 		}
 		return and;
 	}
-	
+
 	public static int indexOf(final @Nullable int[] array, final int num) {
 		if (array == null)
 			return -1;

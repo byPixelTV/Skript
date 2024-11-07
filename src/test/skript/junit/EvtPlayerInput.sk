@@ -13,7 +13,7 @@ test "EvtPlayerInputJUnit" when running JUnit:
 
 	ensure junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtPlayerInputTest" completes {_tests::*}
 
-on player input:
+on toggle of any key:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtPlayerInputTest"
 	junit test is {_test}
 

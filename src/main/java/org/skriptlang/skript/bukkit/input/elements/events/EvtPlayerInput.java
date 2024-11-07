@@ -1,4 +1,4 @@
-package ch.njol.skript.events;
+package org.skriptlang.skript.bukkit.input.elements.events;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
@@ -7,24 +7,22 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.InputKey;
+import org.skriptlang.skript.bukkit.input.InputKey;
 
 import java.util.Set;
 
 public class EvtPlayerInput extends SkriptEvent {
 
 	static {
-		if (Skript.classExists("org.bukkit.Input")) {
-			Skript.registerEvent("Player Input", EvtPlayerInput.class, PlayerInputEvent.class,
-					"[player] (toggle|toggling|1:press[ing]|2:releas(e|ing)) [of] (%-inputkeys%|[a|any] key)",
-					"([player] %-inputkeys%|[a|any] [player] key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
-				.description("Called when a player sends an updated input to the server.",
-					"Note: The input keys event value is the set of keys the player is currently pressing, not the keys that were pressed or released.")
-				.examples("on player press any key:",
-					"\tsend \"You are pressing: %event-inputkeys%\" to player")
-				.since("INSERT VERSION")
-				.requiredPlugins("Minecraft 1.21.3+");
-		}
+		Skript.registerEvent("Player Input", EvtPlayerInput.class, PlayerInputEvent.class,
+				"[player] (toggle|toggling|1:press[ing]|2:release|2:releasing) [of] (%-inputkeys%|[a|any] key)",
+				"([player] %-inputkeys%|[a|any] [player] key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
+			.description("Called when a player sends an updated input to the server.",
+				"Note: The input keys event value is the set of keys the player is currently pressing, not the keys that were pressed or released.")
+			.examples("on player press any key:",
+				"\tsend \"You are pressing: %event-inputkeys%\" to player")
+			.since("INSERT VERSION")
+			.requiredPlugins("Minecraft 1.21.3+");
 	}
 
 	private @Nullable Literal<InputKey> keysToCheck;
@@ -43,7 +41,7 @@ public class EvtPlayerInput extends SkriptEvent {
 		PlayerInputEvent inputEvent = (PlayerInputEvent) event;
 		Set<InputKey> previousKeys = InputKey.fromInput(inputEvent.getPlayer().getCurrentInput());
 		Set<InputKey> currentKeys = InputKey.fromInput(inputEvent.getInput());
-		Set<InputKey> keysToCheck = this.keysToCheck != null ? Set.of(this.keysToCheck.getAll(event)) : null;
+		Set<InputKey> keysToCheck = this.keysToCheck != null ? Set.of(this.keysToCheck.getAll()) : null;
 		boolean and = this.keysToCheck != null && this.keysToCheck.getAnd();
 		return type.checkInputKeys(previousKeys, currentKeys, keysToCheck, and);
 	}
