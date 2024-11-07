@@ -11,19 +11,13 @@ import java.util.Set;
  */
 public enum InputKey {
 
-	FORWARD("forward movement key"),
-	BACKWARD("backward movement key"),
-	RIGHT("right movement key"),
-	LEFT("left movement key"),
-	JUMP("jumping key"),
-	SNEAK("sneaking key"),
-	SPRINT("sprinting key");
-
-	private final String toString;
-
-	InputKey(String toString) {
-		this.toString = toString;
-	}
+	FORWARD,
+	BACKWARD,
+	RIGHT,
+	LEFT,
+	JUMP,
+	SNEAK,
+	SPRINT;
 
 	/**
 	 * Checks if the given {@link Input} is pressing this {@link InputKey}.
@@ -41,11 +35,6 @@ public enum InputKey {
 			case SNEAK -> input.isSneak();
 			case SPRINT -> input.isSprint();
 		};
-	}
-
-	@Override
-	public String toString() {
-		return toString;
 	}
 
 	/**
