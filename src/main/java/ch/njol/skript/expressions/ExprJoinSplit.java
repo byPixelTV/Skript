@@ -118,7 +118,7 @@ public class ExprJoinSplit extends SimpleExpression<String> {
 	public String toString(@Nullable Event event, boolean debug) {
 		StringBuilder builder = new StringBuilder();
 		if (join) {
-			builder.append("join").append(strings.toString(event, debug));
+			builder.append("join ").append(strings.toString(event, debug));
 			if (delimiter != null)
 				builder.append(" with ").append(delimiter.toString(event, debug));
 			return builder.toString();
