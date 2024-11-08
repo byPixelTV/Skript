@@ -34,10 +34,7 @@ import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
-import ch.njol.skript.log.ErrorQuality;
-import ch.njol.skript.log.LogEntry;
-import ch.njol.skript.log.ParseLogHandler;
-import ch.njol.skript.log.SkriptLogger;
+import ch.njol.skript.log.*;
 import ch.njol.skript.patterns.MalformedPatternException;
 import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
@@ -369,12 +366,15 @@ public class SkriptParser {
 				if (parsedExpression != null) { // Expression/VariableString parsing success
 					for (Class<? extends T> type : types) {
 						// Check return type against everything that expression accepts
-						if (parsedExpression.canReturn(type))
-							return convertExpression(parsedExpression, log, type);
+						if (!parsedExpression.canReturn(type))
+							continue;
+						Expression<? extends T> converted = convertExpression(parsedExpression, log, type);
+						if (converted != null)
+							return converted;
 					}
 
 					// No directly same type found
-					return convertExpression(parsedExpression, log, (Class<T>[]) types);
+					return convertExpressionOrError(parsedExpression, log, (Class<T>[]) types);
 				}
 				log.clear();
 			}
@@ -529,33 +529,25 @@ public class SkriptParser {
 			if ((flags & PARSE_EXPRESSIONS) != 0) {
 				Expression<?> parsedExpression = parseExpression(types, expr);
 				if (parsedExpression != null) { // Expression/VariableString parsing success
-					for (int i = 0; i < types.length; i++) {
-						Class<?> type = types[i];
-						if (type == null) // Ignore invalid (null) types
-							continue;
-
-						// Check return type against everything that expression accepts
-						if (parsedExpression.canReturn(type)) {
-							if (!exprInfo.isPlural[i] && !parsedExpression.isSingle()) { // Wrong number of arguments
-								if (context == ParseContext.COMMAND) {
-									Skript.error(Commands.m_too_many_arguments.toString(exprInfo.classes[i].getName().getIndefiniteArticle(), exprInfo.classes[i].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
-								} else {
-									Skript.error("'" + expr + "' can only accept a single " + exprInfo.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
-								}
-								return null;
-							}
-
-							return convertExpression(parsedExpression, log, type);
-						}
-					}
-
 					if (onlySingular && !parsedExpression.isSingle()) {
 						Skript.error("'" + expr + "' can only accept singular expressions, not plural", ErrorQuality.SEMANTIC_ERROR);
 						return null;
 					}
 
+                    for (Class<?> type : types) {
+                        if (type == null) // Ignore invalid (null) types
+                            continue;
+
+                        // Check return type against everything that expression accepts
+                        if (!parsedExpression.canReturn(type))
+                            continue;
+						Expression<?> converted = convertExpression(parsedExpression, log, type);
+						if (converted != null)
+							return converted;
+                    }
+
 					//noinspection unchecked
-					return convertExpression(parsedExpression, log, (Class<Object>[]) types);
+					return convertExpressionOrError(parsedExpression, log, (Class<Object>[]) types);
 				}
 				log.clear();
 			}
@@ -600,12 +592,19 @@ public class SkriptParser {
 	}
 
 	@SafeVarargs
-	private static <T> Expression<? extends T> convertExpression(Expression<?> expression, ParseLogHandler log, Class<T>... types) {
+	private static <T> @Nullable Expression<? extends T> convertExpression(Expression<?> expression, ParseLogHandler log, Class<T>... types) {
 		Expression<? extends T> convertedExpression = expression.getConvertedExpression(types);
-		if (convertedExpression != null) {
-			log.printLog();
+        if (convertedExpression == null)
+			return null;
+        log.printLog();
+        return convertedExpression;
+    }
+
+	@SafeVarargs
+	private static <T> @Nullable Expression<? extends T> convertExpressionOrError(Expression<?> expression, ParseLogHandler log, Class<T>... types) {
+		Expression<? extends T> convertedExpression = convertExpression(expression, log, types);
+		if (convertedExpression != null)
 			return convertedExpression;
-		}
 		log.printError(expression.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
 		return null;
 	}
