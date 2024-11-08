@@ -54,14 +54,15 @@ public class CondIsPressingKey extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		Player eventPlayer = !past && event instanceof PlayerInputEvent inputEvent ? inputEvent.getPlayer() : null;
+		Player eventPlayer = event instanceof PlayerInputEvent inputEvent ? inputEvent.getPlayer() : null;
 		InputKey[] inputKeys = this.inputKeys.getAll(event);
 		boolean and = this.inputKeys.getAnd();
 		return players.check(event, player -> {
 			Input input;
-			if (player.equals(eventPlayer)) {
+			// If we want to get the new input of the event-player, we must get it from the event
+			if (!past && player.equals(eventPlayer)) {
 				input = ((PlayerInputEvent) event).getInput();
-			} else {
+			} else { // Otherwise, we get the current (or past in case of an event-player) input
 				input = player.getCurrentInput();
 			}
 			return CollectionUtils.check(inputKeys, inputKey -> inputKey.check(input), and);

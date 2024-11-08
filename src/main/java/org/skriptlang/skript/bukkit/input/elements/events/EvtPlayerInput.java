@@ -15,11 +15,11 @@ public class EvtPlayerInput extends SkriptEvent {
 
 	static {
 		Skript.registerEvent("Player Input", EvtPlayerInput.class, PlayerInputEvent.class,
-				"[player] (toggle|toggling|1:press[ing]|2:release|2:releasing) [of] (%-inputkeys%|[a|any] key)",
-				"([player] %-inputkeys%|[a|any] [player] key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
+				"[player] (toggle|toggling|1:press[ing]|2:release|2:releasing) [of] (%-inputkeys%|[a|any] input key)",
+				"([player] %-inputkeys%|[a|any] [player] input key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
 			.description("Called when a player sends an updated input to the server.",
 				"Note: The input keys event value is the set of keys the player is currently pressing, not the keys that were pressed or released.")
-			.examples("on player press any key:",
+			.examples("on player press any input key:",
 				"\tsend \"You are pressing: %event-inputkeys%\" to player")
 			.since("INSERT VERSION")
 			.requiredPlugins("Minecraft 1.21.3+");
@@ -52,7 +52,7 @@ public class EvtPlayerInput extends SkriptEvent {
 		builder.append("player ");
 		builder.append(type.name().toLowerCase());
 		builder.append(" ");
-		builder.append(keysToCheck == null ? "any key" : keysToCheck.toString(event, debug));
+		builder.append(keysToCheck == null ? "any input key" : keysToCheck.toString(event, debug));
 		return builder.toString();
 	}
 
@@ -98,14 +98,14 @@ public class EvtPlayerInput extends SkriptEvent {
 		 * @return true if the condition is met based on the input type, false otherwise
 		 */
 		public boolean checkInputKeys(Set<InputKey> previous, Set<InputKey> current, @Nullable Set<InputKey> keysToCheck, boolean and) {
-            if (keysToCheck == null) {
+			if (keysToCheck == null) {
 				return switch (this) {
 					case TOGGLE -> true;
 					case PRESS -> previous.size() <= current.size();
 					case RELEASE -> previous.size() >= current.size();
 				};
 			}
-            for (InputKey key : keysToCheck) {
+			for (InputKey key : keysToCheck) {
 				boolean inPrevious = previous.contains(key);
 				boolean inCurrent = current.contains(key);
 				if (and && !checkKeyState(inPrevious, inCurrent)) {

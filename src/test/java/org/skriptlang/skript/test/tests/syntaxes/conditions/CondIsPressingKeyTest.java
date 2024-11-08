@@ -82,7 +82,7 @@ public class CondIsPressingKeyTest extends SkriptJUnitTest {
 				case JUMP -> EasyMock.expect(input.isJump()).andReturn(true);
 				case SNEAK -> EasyMock.expect(input.isSneak()).andReturn(true);
 				case SPRINT -> EasyMock.expect(input.isSprint()).andReturn(true);
-            }
+			}
 		}
 		EasyMock.replay(input);
 		return input;
