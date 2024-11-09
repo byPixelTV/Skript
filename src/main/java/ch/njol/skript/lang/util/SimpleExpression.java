@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.ConverterInfo;
+import org.skriptlang.skript.lang.converter.Converters;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -203,8 +204,9 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	@Nullable
 	@SuppressWarnings("unchecked")
 	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
+		Class<? extends T> returnType = getReturnType();
 		// check whether this expression is already of type R
-		if (CollectionUtils.containsSuperclass(to, getReturnType()))
+		if (CollectionUtils.containsSuperclass(to, returnType))
 			return (Expression<? extends R>) this;
 
 		// we might be to cast some of the possible return types to R
@@ -214,11 +216,18 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 				// build a converter that for casting to R
 				// safety check is present in the event that we do not get this type at runtime
 				final Class<R> toType = (Class<R>) type;
-				infos.add(new ConverterInfo<>(getReturnType(), toType, fromObject -> {
+				infos.add(new ConverterInfo<>(returnType, toType, fromObject -> {
 					if (toType.isInstance(fromObject))
 						return (R) fromObject;
 					return null;
 				}, 0));
+			} else { // this possible return type is not included in 'to'
+				// build all converters for converting the possible return type into any of the types of 'to'
+				for (Class<R> toType : to) {
+					ConverterInfo<? extends T, R> converter = Converters.getConverterInfo(type, toType);
+					if (converter != null)
+						infos.add(converter);
+				}
 			}
 		}
 		int size = infos.size();
