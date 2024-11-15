@@ -14,39 +14,49 @@ test "EvtPlayerInputJUnit" when running JUnit:
 
 	ensure junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtPlayerInputTest" completes {_tests::*}
 
-on toggle of any input key:
-	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtPlayerInputTest"
-	junit test is {_test}
+parse:
+	results: {EvtPlayerInput::parse::*}
+	code:
+		on toggle of any input key:
+			set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtPlayerInputTest"
+			junit test is {_test}
 
-	if player is pressing event-inputkeys:
-		complete objective "player is pressing event-inputkeys" for {_test}
+			if player is pressing event-inputkeys:
+				complete objective "player is pressing event-inputkeys" for {_test}
 
-	if inputs of player is event-inputkeys:
-		complete objective "inputs of player is event-inputkeys" for {_test}
+			if inputs of player is event-inputkeys:
+				complete objective "inputs of player is event-inputkeys" for {_test}
 
-	if past inputs of player is past event-inputkeys:
-		complete objective "past inputs of player is past event-inputkeys" for {_test}
+			if past inputs of player is past event-inputkeys:
+				complete objective "past inputs of player is past event-inputkeys" for {_test}
 
-	if player is pressing forward key:
-		complete objective "player is pressing forward key" for {_test}
+			if player is pressing forward key:
+				complete objective "player is pressing forward key" for {_test}
 
-	if player is pressing jump key:
-		complete objective "player is pressing jump key" for {_test}
+			if player is pressing jump key:
+				complete objective "player is pressing jump key" for {_test}
 
-	if player is pressing forward key and jump key:
-		complete objective "player is pressing forward key and jump key" for {_test}
+			if player is pressing forward key and jump key:
+				complete objective "player is pressing forward key and jump key" for {_test}
 
-	if player is pressing forward key, sneak key, or backward key:
-		complete objective "player is pressing forward key, sneak key, or backward key" for {_test}
+			if player is pressing forward key, sneak key, or backward key:
+				complete objective "player is pressing forward key, sneak key, or backward key" for {_test}
 
-	if player is not pressing sneak key:
-		complete objective "player is not pressing sneak key" for {_test}
+			if player is not pressing sneak key:
+				complete objective "player is not pressing sneak key" for {_test}
 
-	if player is not pressing forward key and sneak key:
-		complete objective "player is not pressing forward key and sneak key" for {_test}
+			if player is not pressing forward key and sneak key:
+				complete objective "player is not pressing forward key and sneak key" for {_test}
 
-	if player was pressing forward key:
-		complete objective "player was pressing forward key" for {_test}
+			if player was pressing forward key:
+				complete objective "player was pressing forward key" for {_test}
 
-	if player was not pressing jump key:
-		complete objective "player was not pressing jump key" for {_test}
+			if player was not pressing jump key:
+				complete objective "player was not pressing jump key" for {_test}
+
+test "EvtPlayerInput":
+	if running minecraft "1.21.3":
+		assert {EvtPlayerInput::parse::*} is not set with "Player input event failed to parse in 1.21.3 and above"
+	else:
+		assert {EvtPlayerInput::parse::*} is set with "Player input event successfully parsed in 1.21.2 and below"
+
