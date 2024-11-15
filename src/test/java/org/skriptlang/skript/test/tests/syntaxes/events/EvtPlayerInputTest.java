@@ -13,7 +13,7 @@ import org.skriptlang.skript.bukkit.input.InputKey;
 
 public class EvtPlayerInputTest extends SkriptJUnitTest {
 
-	private static final boolean SUPPORTS_INPUT = Skript.classExists("org.bukkit.Input");
+	private static final boolean SUPPORTS_INPUT_EVENT = Skript.classExists("org.bukkit.event.player.PlayerInputEvent");
 
 	static {
 		setShutdownDelay(1);
@@ -23,14 +23,14 @@ public class EvtPlayerInputTest extends SkriptJUnitTest {
 
 	@Before
 	public void setup() {
-		if (!SUPPORTS_INPUT)
+		if (!SUPPORTS_INPUT_EVENT)
 			return;
 		player = EasyMock.niceMock(Player.class);
 	}
 
 	@Test
 	public void test() {
-		if (!SUPPORTS_INPUT)
+		if (!SUPPORTS_INPUT_EVENT)
 			return;
 		Input pastInput = fromKeys(InputKey.FORWARD);
 		Input futureInput = fromKeys(InputKey.FORWARD, InputKey.JUMP);

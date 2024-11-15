@@ -24,16 +24,23 @@ import org.skriptlang.skript.bukkit.input.InputKey;
 })
 @Since("INSERT VERSION")
 @Keywords({"press", "input"})
-@RequiredPlugins("Minecraft 1.21.3+")
+@RequiredPlugins("Minecraft 1.21.2+")
 public class CondIsPressingKey extends Condition {
 
 	static {
-		Skript.registerCondition(CondIsPressingKey.class,
-			"%players% (is|are) pressing %inputkeys%",
-			"%players% (isn't|is not|aren't|are not) pressing %inputkeys%",
-			"%players% (was|were) pressing %inputkeys%",
-			"%players% (wasn't|was not|weren't|were not) pressing %inputkeys%"
-		);
+		if (Skript.classExists("org.bukkit.event.player.PlayerInputEvent")) {
+			Skript.registerCondition(CondIsPressingKey.class,
+				"%players% (is|are) pressing %inputkeys%",
+				"%players% (isn't|is not|aren't|are not) pressing %inputkeys%",
+				"%players% (was|were) pressing %inputkeys%",
+				"%players% (wasn't|was not|weren't|were not) pressing %inputkeys%"
+			);
+		} else {
+			Skript.registerCondition(CondIsPressingKey.class,
+				"%players% (is|are) pressing %inputkeys%",
+				"%players% (isn't|is not|aren't|are not) pressing %inputkeys%"
+			);
+		}
 	}
 
 	private Expression<Player> players;

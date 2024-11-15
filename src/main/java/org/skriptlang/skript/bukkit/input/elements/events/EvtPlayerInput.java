@@ -15,15 +15,17 @@ import java.util.Set;
 public class EvtPlayerInput extends SkriptEvent {
 
 	static {
-		Skript.registerEvent("Player Input", EvtPlayerInput.class, PlayerInputEvent.class,
-				"[player] (toggle|toggling|1:press[ing]|2:release|2:releasing) [of] (%-inputkeys%|[a|any] input key)",
-				"([player] %-inputkeys%|[a|any] [player] input key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
-			.description("Called when a player sends an updated input to the server.",
-				"Note: The input keys event value is the set of keys the player is currently pressing, not the keys that were pressed or released.")
-			.examples("on player press any input key:",
-				"\tsend \"You are pressing: %event-inputkeys%\" to player")
-			.since("INSERT VERSION")
-			.requiredPlugins("Minecraft 1.21.3+");
+		if (Skript.classExists("org.bukkit.event.player.PlayerInputEvent")) {
+			Skript.registerEvent("Player Input", EvtPlayerInput.class, PlayerInputEvent.class,
+					"[player] (toggle|toggling|1:press[ing]|2:release|2:releasing) [of] (%-inputkeys%|[a|any] input key)",
+					"([player] %-inputkeys%|[a|any] [player] input key) (toggle|toggling|1:press[ing]|2:releas(e|ing))")
+				.description("Called when a player sends an updated input to the server.",
+					"Note: The input keys event value is the set of keys the player is currently pressing, not the keys that were pressed or released.")
+				.examples("on player press any input key:",
+					"\tsend \"You are pressing: %event-inputkeys%\" to player")
+				.since("INSERT VERSION")
+				.requiredPlugins("Minecraft 1.21.3+");
+		}
 	}
 
 	private @Nullable Literal<InputKey> keysToCheck;

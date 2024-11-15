@@ -20,8 +20,10 @@ import java.util.List;
 @Description("Get the current input keys of a player.")
 @Examples("broadcast \"%player% is pressing %current input keys of player%\"")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21.3+")
+@RequiredPlugins("Minecraft 1.21.2+")
 public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
+
+	private static final boolean SUPPORTS_TIME_STATES = Skript.classExists("org.bukkit.event.player.PlayerInputEvent");
 
 	static {
 		register(ExprCurrentInputKeys.class, InputKey.class, "[current] (inputs|input keys)", "players");
@@ -35,8 +37,11 @@ public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 
 	@Override
 	protected InputKey[] get(Event event, Player[] source) {
-		Player eventPlayer = getTime() == EventValues.TIME_NOW && event instanceof PlayerInputEvent inputEvent ? inputEvent.getPlayer() : null;
-		List<InputKey> inputKeys = new ArrayList<>();
+		Player eventPlayer = null;
+		if (SUPPORTS_TIME_STATES && getTime() == EventValues.TIME_NOW && event instanceof PlayerInputEvent inputEvent)
+			eventPlayer = inputEvent.getPlayer();
+
+        List<InputKey> inputKeys = new ArrayList<>();
 		for (Player player : source) {
 			if (player.equals(eventPlayer)) {
 				inputKeys.addAll(InputKey.fromInput(((PlayerInputEvent) event).getInput()));
@@ -59,6 +64,8 @@ public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 
 	@Override
 	public boolean setTime(int time) {
+		if (!SUPPORTS_TIME_STATES)
+			return super.setTime(time);
 		return time != EventValues.TIME_FUTURE && setTime(time, PlayerInputEvent.class);
 	}
 
