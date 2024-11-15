@@ -5,13 +5,13 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.util.ContextlessEvent;
 import ch.njol.skript.test.runner.SkriptJUnitTest;
 import ch.njol.skript.variables.Variables;
-import org.bukkit.Input;
 import org.bukkit.entity.Player;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.skriptlang.skript.bukkit.input.InputKey;
+import org.skriptlang.skript.test.utils.InputHelper;
 
 public class CondIsPressingKeyTest extends SkriptJUnitTest {
 
@@ -45,47 +45,30 @@ public class CondIsPressingKeyTest extends SkriptJUnitTest {
 		Variables.setVariable("player", testPlayer, event, true);
 		Variables.setVariable("input-keys::1", testInputKeys[0], event, true);
 
-		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(fromKeys(testInputKeys));
+		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(InputHelper.fromKeys(testInputKeys));
 		EasyMock.replay(testPlayer);
 		assert isPressingKeyCondition.check(event);
 		EasyMock.verify(testPlayer);
 
 		EasyMock.resetToNice(testPlayer);
-		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(fromKeys(testInputKeys[1]));
+		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(InputHelper.fromKeys(testInputKeys[1]));
 		EasyMock.replay(testPlayer);
 		assert !isPressingKeyCondition.check(event);
 		EasyMock.verify(testPlayer);
 
 		EasyMock.resetToNice(testPlayer);
 		Variables.setVariable("input-keys::2", testInputKeys[1], event, true);
-		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(fromKeys(testInputKeys));
+		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(InputHelper.fromKeys(testInputKeys));
 		EasyMock.replay(testPlayer);
 		assert isPressingKeyCondition.check(event);
 		EasyMock.verify(testPlayer);
 
 		EasyMock.resetToNice(testPlayer);
 		Variables.setVariable("input-keys::3", InputKey.SNEAK, event, true);
-		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(fromKeys(testInputKeys));
+		EasyMock.expect(testPlayer.getCurrentInput()).andReturn(InputHelper.fromKeys(testInputKeys));
 		EasyMock.replay(testPlayer);
 		assert !isPressingKeyCondition.check(event);
 		EasyMock.verify(testPlayer);
-	}
-
-	private Input fromKeys(InputKey... keys) {
-		Input input = EasyMock.niceMock(Input.class);
-		for (InputKey key : keys) {
-			switch (key) {
-				case FORWARD -> EasyMock.expect(input.isForward()).andReturn(true);
-				case BACKWARD -> EasyMock.expect(input.isBackward()).andReturn(true);
-				case RIGHT -> EasyMock.expect(input.isRight()).andReturn(true);
-				case LEFT -> EasyMock.expect(input.isLeft()).andReturn(true);
-				case JUMP -> EasyMock.expect(input.isJump()).andReturn(true);
-				case SNEAK -> EasyMock.expect(input.isSneak()).andReturn(true);
-				case SPRINT -> EasyMock.expect(input.isSprint()).andReturn(true);
-			}
-		}
-		EasyMock.replay(input);
-		return input;
 	}
 
 }

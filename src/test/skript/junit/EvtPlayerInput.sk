@@ -1,4 +1,5 @@
 test "EvtPlayerInputJUnit" when running JUnit:
+	running minecraft "1.21.3"
 	set {_tests::1} to "player is pressing event-inputkeys"
 	set {_tests::2} to "inputs of player is event-inputkeys"
 	set {_tests::3} to "past inputs of player is past event-inputkeys"
