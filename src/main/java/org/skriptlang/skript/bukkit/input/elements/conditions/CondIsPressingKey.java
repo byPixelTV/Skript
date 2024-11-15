@@ -5,6 +5,7 @@ import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Input;
@@ -71,17 +72,17 @@ public class CondIsPressingKey extends Condition {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(players.toString(event, debug));
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append(players);
 		if (past) {
-			builder.append(players.isSingle() ? " was " : " were ");
+			builder.append(players.isSingle() ? "was" : "were");
 		} else {
-			builder.append(players.isSingle() ? " is " : " are ");
+			builder.append(players.isSingle() ? "is" : "are");
 		}
 		if (isNegated())
-			builder.append("not ");
-		builder.append("pressing ");
-		builder.append(inputKeys.toString(event, debug));
+			builder.append("not");
+		builder.append("pressing");
+		builder.append(inputKeys);
 		return builder.toString();
 	}
 

@@ -4,6 +4,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.jetbrains.annotations.Nullable;
@@ -48,11 +49,10 @@ public class EvtPlayerInput extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("player ");
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("player");
 		builder.append(type.name().toLowerCase());
-		builder.append(" ");
-		builder.append(keysToCheck == null ? "any input key" : keysToCheck.toString(event, debug));
+		builder.append(keysToCheck == null ? "any input key" : keysToCheck);
 		return builder.toString();
 	}
 
