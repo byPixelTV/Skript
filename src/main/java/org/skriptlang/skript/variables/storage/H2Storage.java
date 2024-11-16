@@ -20,10 +20,9 @@ package org.skriptlang.skript.variables.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.zaxxer.hikari.HikariConfig;
 

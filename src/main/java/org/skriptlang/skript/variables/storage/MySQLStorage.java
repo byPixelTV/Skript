@@ -31,7 +31,7 @@ import ch.njol.util.NonNullPair;
 
 import com.zaxxer.hikari.HikariConfig;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class MySQLStorage extends JdbcStorage {
 

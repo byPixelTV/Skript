@@ -42,6 +42,7 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.SynchronizedReference;
 
@@ -226,7 +227,7 @@ public abstract class JdbcStorage extends VariablesStorage {
 			Timespan monitor_interval = getValue(section, "monitor interval", Timespan.class);
 			this.monitor = monitor_interval != null;
 			if (monitor)
-				this.monitor_interval = monitor_interval.getMilliSeconds();
+				this.monitor_interval = monitor_interval.getAs(TimePeriod.MILLISECOND);
 
 			HikariConfig configuration = configuration(section);
 			if (configuration == null)
@@ -234,7 +235,7 @@ public abstract class JdbcStorage extends VariablesStorage {
 
 			Timespan commit_changes = getOptional(section, "commit changes", Timespan.class);
 			if (commit_changes != null)
-				enablePeriodicalCommits(configuration, commit_changes.getMilliSeconds());
+				enablePeriodicalCommits(configuration, commit_changes.getAs(TimePeriod.MILLISECOND));
 
 			// Max lifetime is 30 minutes, idle lifetime is 10 minutes. This value has to be less than.
 			configuration.setKeepaliveTime(TimeUnit.MINUTES.toMillis(5));
