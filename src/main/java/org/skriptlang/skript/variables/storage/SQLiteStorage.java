@@ -51,7 +51,7 @@ public class SQLiteStorage extends JdbcStorage {
 
 	@Override
 	@Nullable
-	public HikariConfig configuration(SectionNode config) {
+	public final HikariConfig configuration(SectionNode config) {
 		File file = this.file;
 		if (file == null)
 			return null;

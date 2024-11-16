@@ -41,7 +41,6 @@ public class H2StorageTest {
 	private final String testSection =
 			"h2:\n" +
 				"\tpattern: .*\n" +
-				"\tmonitor interval: 30 seconds\n" +
 				"\tfile: ./plugins/Skript/variables\n" +
 				"\tbackup interval: 0";
 
@@ -63,7 +62,6 @@ public class H2StorageTest {
 		database = new H2Storage(Skript.getAddonInstance(), "H2");
 		SectionNode section = new SectionNode("h2", "", config.getMainNode(), 0);
 		section.add(new EntryNode("pattern", ".*", section));
-		section.add(new EntryNode("monitor interval", "30 seconds", section));
 		section.add(new EntryNode("file", "./plugins/Skript/variables", section));
 		section.add(new EntryNode("backup interval", "0", section));
 		assertTrue(database.load_i(section));
@@ -77,7 +75,6 @@ public class H2StorageTest {
 			assertTrue(database.save("testing", "string", Classes.serialize("Hello World!").data));
 //			SerializedVariable result = database.executeTestQuery();
 //			assertTrue(result != null);
-//			System.out.println(result.getName());
 		}
 	}
 

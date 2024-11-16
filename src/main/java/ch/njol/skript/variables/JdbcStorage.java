@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +45,7 @@ import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.SynchronizedReference;
 
-public abstract class JdbcStorage extends VariablesStorage {
+public abstract class JdbcStorage extends VariableStorage {
 
 	protected static final String DEFAULT_TABLE_NAME = "variables21";
 
@@ -106,11 +105,11 @@ public abstract class JdbcStorage extends VariablesStorage {
 		this.table = "variables21";
 	}
 
-	public String getTableName() {
+	public final String getTableName() {
 		return table;
 	}
 
-	public void setTableName(String tableName) {
+	public final void setTableName(String tableName) {
 		this.table = tableName;
 	}
 
@@ -219,10 +218,10 @@ public abstract class JdbcStorage extends VariablesStorage {
 
 	/**
 	 * Doesn't lock the database for reading (it's not used anywhere else, and locking while loading will interfere with loaded variables being deleted by
-	 * {@link Variables#variableLoaded(String, Object, VariablesStorage)}).
+	 * {@link Variables#variableLoaded(String, Object, VariableStorage)}).
 	 */
 	@Override
-	protected final boolean load(SectionNode section) {
+	protected final boolean loadAbstract(SectionNode section) {
 		synchronized (database) {
 			Timespan monitor_interval = getValue(section, "monitor interval", Timespan.class);
 			this.monitor = monitor_interval != null;
@@ -285,27 +284,20 @@ public abstract class JdbcStorage extends VariablesStorage {
 				sqlException(e);
 				return false;
 			}
-			return loadJdbcConfiguration(section);
+			return load(section);
 		}
 	}
 
 	/**
-	 * Override for custom configuration nodes.
-	 * <p>
-	 * Loads any custom configurations from the section node
-	 * after internal Skript has loaded required nodes for Jdbc databases.
-	 * 
-	 * @param section The section node from the config.sk database type this class reflects.
-	 * @return true if this configuration was successfully loaded and passed all required nodes.
+	 * Override this method to load a custom configuration reading.
 	 */
-	// Since load_i(SectionNode) is final and load(SectionNode) needs to be final,
-	// this method is for extending JdbcStorage classes.
-	protected boolean loadJdbcConfiguration(SectionNode section) {
+	public boolean load(SectionNode n) {
 		return true;
 	}
 
 	/**
-	 * Doesn't lock the database - {@link #save(String, String, byte[])} does that // what?
+	 * Doesn't lock the database
+	 * {@link #save(String, String, byte[])} does that as values are inserted in the database.
 	 */
 	private void loadVariables(ResultSet result) throws SQLException {
 		SQLException e = Task.callSync(new Callable<SQLException>() {

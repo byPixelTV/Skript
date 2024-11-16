@@ -36,6 +36,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.skript.variables.SerializedVariable.Value;
 import ch.njol.util.Closeable;
 
@@ -48,8 +49,7 @@ import ch.njol.util.Closeable;
  * @see DatabaseStorage
  */
 // FIXME ! large databases (>25 MB) cause the server to be unresponsive instead of loading slowly
-@SuppressWarnings("SuspiciousIndentAfterControlStatement")
-public abstract class VariablesStorage implements Closeable {
+public abstract class VariableStorage implements Closeable {
 
 	/**
 	 * The size of the variable changes queue.
@@ -102,7 +102,7 @@ public abstract class VariablesStorage implements Closeable {
 	 *
 	 * @param name the name.
 	 */
-	protected VariablesStorage(SkriptAddon source, String name) {
+	protected VariableStorage(SkriptAddon source, String name) {
 		assert name != null;
 		databaseName = name;
 		this.source = source;
@@ -129,7 +129,7 @@ public abstract class VariablesStorage implements Closeable {
 	/**
 	 * @return The SkriptAddon instance that registered this VariableStorage.
 	 */
-	public SkriptAddon getRegisterSource() {
+	public final SkriptAddon getRegisterSource() {
 		return source;
 	}
 
@@ -142,7 +142,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * or not found.
 	 */
 	@Nullable
-	protected String getValue(SectionNode sectionNode, String key) {
+	protected final String getValue(SectionNode sectionNode, String key) {
 		return getValue(sectionNode, key, String.class);
 	}
 
@@ -158,7 +158,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * @param <T> the type.
 	 */
 	@Nullable
-	protected <T> T getValue(SectionNode sectionNode, String key, Class<T> type) {
+	protected final <T> T getValue(SectionNode sectionNode, String key, Class<T> type) {
 		return getValue(sectionNode, key, type, true);
 	}
 
@@ -174,7 +174,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * @param <T> the type.
 	 */
 	@Nullable
-	protected <T> T getOptional(SectionNode sectionNode, String key, Class<T> type) {
+	protected final <T> T getOptional(SectionNode sectionNode, String key, Class<T> type) {
 		return getValue(sectionNode, key, type, false);
 	}
 
@@ -193,7 +193,6 @@ public abstract class VariablesStorage implements Closeable {
 	@Nullable
 	private <T> T getValue(SectionNode sectionNode, String key, Class<T> type, boolean error) {
 		String rawValue = sectionNode.getValue(key);
-		// Section node doesn't have this key
 		if (rawValue == null) {
 			if (error)
 				Skript.error("The config is missing the entry for '" + key + "' in the database '" + databaseName + "'");
@@ -292,13 +291,23 @@ public abstract class VariablesStorage implements Closeable {
 		}
 
 		// Load the entries custom to the variable storage
-		if (!load(sectionNode))
+		if (!loadAbstract(sectionNode))
 			return false;
 
 		writeThread.start();
 		Skript.closeOnDisable(this);
-
 		return true;
+	}
+
+	/**
+	 * Used for abstract extending classes intercepting the
+	 * configuration before sending to the final implementation class.
+	 * 
+	 * Override to use this method in AnotherAbstractClass;
+	 * VariablesStorage -> AnotherAbstractClass -> FinalImplementation
+	 */
+	protected boolean loadAbstract(SectionNode sectionNode) {
+		return load(sectionNode);
 	}
 
 	/**
@@ -370,9 +379,10 @@ public abstract class VariablesStorage implements Closeable {
 	 */
 	public void startBackupTask(Timespan backupInterval, boolean removeBackups, int toKeep) {
 		// File is null or backup interval is invalid
-		if (file == null || backupInterval.getTicks() == 0)
+		var ticks = backupInterval.getAs(TimePeriod.TICK);
+		if (file == null || ticks == 0)
 			return;
-		backupTask = new Task(Skript.getInstance(), backupInterval.getTicks(), backupInterval.getTicks(), true) {
+		backupTask = new Task(Skript.getInstance(), backupInterval.getAs(TimePeriod.TICK), backupInterval.getAs(TimePeriod.TICK), true) {
 			@Override
 			public void run() {
 				synchronized (connectionLock) {
@@ -503,7 +513,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * Only used if all variables are saved immediately
 	 * after calling this method.
 	 */
-	protected void clearChangesQueue() {
+	protected final void clearChangesQueue() {
 		changesQueue.clear();
 	}
 

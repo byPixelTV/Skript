@@ -47,7 +47,7 @@ public class H2Storage extends JdbcStorage {
 
 	@Override
 	@Nullable
-	public HikariConfig configuration(SectionNode config) {
+	public final HikariConfig configuration(SectionNode config) {
 		if (file == null)
 			return null;
 		HikariConfig configuration = new HikariConfig();
