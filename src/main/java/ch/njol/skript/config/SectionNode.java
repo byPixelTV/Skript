@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.config;
 
 import ch.njol.skript.Skript;
@@ -27,6 +9,7 @@ import ch.njol.util.NonNullPair;
 import ch.njol.util.NullableChecker;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.CheckedIterator;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,9 +21,6 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
-/**
- * @author Peter Güttinger
- */
 public class SectionNode extends Node implements Iterable<Node> {
 	
 	private final ArrayList<Node> nodes = new ArrayList<>();
@@ -81,29 +61,42 @@ public class SectionNode extends Node implements Iterable<Node> {
 	/**
 	 * Adds the given node at the end of this section.
 	 * 
-	 * @param n
+	 * @param node
 	 */
-	public void add(final Node n) {
-		n.remove();
-		nodes.add(n);
-		n.parent = this;
-		n.config = config;
-		getNodeMap().put(n);
+	public void add(@NotNull Node node) {
+		node.remove();
+		nodes.add(node);
+		node.parent = this;
+		node.config = config;
+		getNodeMap().put(node);
 	}
-	
+
 	/**
-	 * Inserts the given node into this section at the specified position.
-	 * 
-	 * @param n
-	 * @param index between 0 and {@link #size()}, inclusive
+	 * Inserts {@code node} into this section at the specified position.
+	 *
+	 * @param node The node to insert
+	 * @param idx The index, between 0 and {@link #size()} (inclusive), at which to insert the node
 	 */
+	public void add(int idx, @NotNull Node node) {
+		Preconditions.checkArgument(idx >= 0 && idx <= size(), "idx out of bounds: %s", idx);
+
+		nodes.add(idx, node);
+		node.parent = this;
+		node.config = config;
+		getNodeMap().put(node);
+	}
+
+	/**
+	 * @deprecated Use {@link #add(int, Node)} instead.
+	 */
+	@Deprecated(forRemoval = true)
 	public void insert(final Node n, final int index) {
 		nodes.add(index, n);
 		n.parent = this;
 		n.config = config;
 		getNodeMap().put(n);
 	}
-	
+
 	/**
 	 * Removes the given node from this section.
 	 * 
@@ -526,5 +519,5 @@ public class SectionNode extends Node implements Iterable<Node> {
 
 		return different;
 	}
-	
+
 }
