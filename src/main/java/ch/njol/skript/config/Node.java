@@ -1,39 +1,14 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.config;
-
-import java.io.PrintWriter;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import ch.njol.skript.SkriptConfig;
-import org.jetbrains.annotations.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Peter Güttinger
- */
+import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class Node {
 	
 	@Nullable
@@ -356,60 +331,25 @@ public abstract class Node {
 	public boolean isVoid() {
 		return this instanceof VoidNode;// || this instanceof ParseOptionNode;
 	}
-	
-//	/**
-//	 * get a node via path:to:the:node. relative paths are possible by starting with a ':'; a double colon '::' will go up a node.<br/>
-//	 * selecting the n-th node can be done with #n.
-//	 *
-//	 * @param path
-//	 * @return the node at the given path or null if the path is invalid
-//	 */
-//	public Node getNode(final String path) {
-//		return getNode(path, false);
-//	}
-//
-//	public Node getNode(String path, final boolean create) {
-//		Node n;
-//		if (path.startsWith(":")) {
-//			path = path.substring(1);
-//			n = this;
-//		} else {
-//			n = config.getMainNode();
-//		}
-//		for (final String s : path.split(":")) {
-//			if (s.isEmpty()) {
-//				n = n.getParent();
-//				if (n == null) {
-//					n = config.getMainNode();
-//				}
-//				continue;
-//			}
-//			if (!(n instanceof SectionNode)) {
-//				return null;
-//			}
-//			if (s.startsWith("#")) {
-//				int i = -1;
-//				try {
-//					i = Integer.parseInt(s.substring(1));
-//				} catch (final NumberFormatException e) {
-//					return null;
-//				}
-//				if (i <= 0 || i > ((SectionNode) n).getNodeList().size())
-//					return null;
-//				n = ((SectionNode) n).getNodeList().get(i - 1);
-//			} else {
-//				final Node oldn = n;
-//				n = ((SectionNode) n).get(s);
-//				if (n == null) {
-//					if (!create)
-//						return null;
-//					((SectionNode) oldn).getNodeList().add(n = new SectionNode(s, (SectionNode) oldn, "", -1));
-//				}
-//			}
-//		}
-//		return n;
-//	}
-	
+
+	/**
+	 * @return The index of this node relative to the other children of this node's parent,
+	 * or -1 if this node does not have a parent.
+	 */
+	public int getIndex() {
+		if (parent == null)
+			return -1;
+
+		int idx = 0;
+		for (Node node : parent) {
+			if (node == this)
+				return idx;
+
+			idx++;
+		}
+		return -1;
+	}
+
 	/**
 	 * returns information about this node which looks like the following:<br/>
 	 * <code>node value #including comments (config.sk, line xyz)</code>
