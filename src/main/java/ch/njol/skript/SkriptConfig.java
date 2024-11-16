@@ -4,7 +4,6 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EnumParser;
 import ch.njol.skript.config.Option;
 import ch.njol.skript.config.OptionSection;
-import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.hooks.Hook;
 import ch.njol.skript.hooks.VaultHook;
 import ch.njol.skript.hooks.regions.GriefPreventionHook;
@@ -363,7 +362,7 @@ public class SkriptConfig {
 			SkriptConfig.mainConfig = mainConfig;
 
 			String configVersion = mainConfig.get(version.key);
-//			if (configVersion == null || Skript.getVersion().compareTo(new Version(configVersion)) != 0) { TODO
+			if (configVersion == null || Skript.getVersion().compareTo(new Version(configVersion)) != 0) {
 				try (InputStream stream = Skript.getInstance().getResource("config.sk")) {
 					if (stream == null) {
 						Skript.error("Your config is outdated, but Skript couldn't find the newest config in its jar.");
@@ -371,8 +370,8 @@ public class SkriptConfig {
 					}
 					Config newConfig = new Config(stream, "Skript.jar/config.sk", false, false, ":");
 
-					boolean updated = mainConfig.updateKeys(newConfig/*, version.key, databases.key */);
-					mainConfig.getMainNode().set(version.key, Skript.getVersion().toString());
+					boolean updated = mainConfig.updateKeys(newConfig);
+//					mainConfig.getMainNode().set(version.key, Skript.getVersion().toString());
 					mainConfig.save(configFile);
 
 					if (updated) {
@@ -384,7 +383,7 @@ public class SkriptConfig {
 					Skript.exception(ex, "Could not load the main config");
 					return;
 				}
-//			}
+			}
 
 			mainConfig.load(SkriptConfig.class);
 		} catch (RuntimeException ex) {

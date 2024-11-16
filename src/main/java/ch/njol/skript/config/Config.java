@@ -143,17 +143,21 @@ public class Config implements Comparable<Config> {
 	}
 
 	/**
-	 * Sets this config's values to those in the given config.
-	 * <p>
-	 * Used by Skript to import old settings into the updated config. The return value is used to not modify the config if no new options were added.
-	 *
-	 * @param other
-	 * @return Whether the configs' keys differ, i.e. false == configs only differ in values, not keys.
+	 * @deprecated This copies all values from the other config and sets them in this config,
+	 * which could be destructive for sensitive data if something goes wrong.
+	 * Use {@link #updateKeys(Config)} instead.
 	 */
+	@Deprecated(forRemoval = true)
 	public boolean setValues(final Config other) {
 		return getMainNode().setValues(other.getMainNode());
 	}
 
+	/**
+	 * @deprecated This copies all values from the other config and sets them in this config,
+	 * which could be destructive for sensitive data if something goes wrong.
+	 * Use {@link #updateKeys(Config)} instead.
+	 */
+	@Deprecated(forRemoval = true)
 	public boolean setValues(final Config other, final String... excluded) {
 		return getMainNode().setValues(other.getMainNode(), excluded);
 	}
@@ -171,56 +175,62 @@ public class Config implements Comparable<Config> {
 		Set<String> oldKeys = findKeys(getMainNode(), "");
 
 		newKeys.removeAll(oldKeys);
-		Set<String> missingKeys = Set.copyOf(newKeys);
+		Set<String> missingKeys = new LinkedHashSet<>(newKeys);
 
 		if (missingKeys.isEmpty())
 			return false;
 
 		for (String key : missingKeys) {
-			String value = newer.getByPath(key);
-			if (value == null)
-				return false;
-
-			int splitAt = key.lastIndexOf('.');
-			if (splitAt == -1) { // top level key
-				getMainNode().add(new EntryNode(key, value, getMainNode()));
+			Node node = newer.getNode(key);
+			if (!(node instanceof EntryNode entryNode))
 				continue;
-			}
 
-			String pathToKey = key.substring(0, splitAt);
-			String leafKey = key.substring(splitAt + 1); // exclude .
-
-			Node parent = getNode(pathToKey);
-
-			if (parent == null) // parent section does not exist, so check all ancestors and add them if missing
-				parent = addMissingAncestors(pathToKey.split("\\.")).getLast();
-
-			if (parent instanceof SectionNode sectionNode)
-				sectionNode.add(new EntryNode(leafKey, value, sectionNode));
+			updateEntry(key, entryNode);
 		}
 		return true;
 	}
 
+	private void updateEntry(@NotNull String key, @NotNull EntryNode node) {
+		int idx = node.getIndex();
+		int splitAt = key.lastIndexOf('.');
+		if (splitAt == -1) { // top level key
+			getMainNode().add(idx, new EntryNode(key, node.getValue(), node.getComment(), getMainNode(), idx));
+			return;
+		}
+
+		String pathToKey = key.substring(0, splitAt);
+		String leafKey = key.substring(splitAt + 1); // exclude .
+
+		Node parent = getNode(pathToKey);
+
+		if (parent == null) // parent section does not exist, so check all ancestors and add them if missing
+			parent = addMissingAncestors(pathToKey.split("\\.")).getLast();
+
+		if (parent instanceof SectionNode parentSection) {
+			parentSection.add(idx, new EntryNode(leafKey, node.getValue(), node.getComment(), parentSection, -1));
+		}
+	}
+
 	/**
-	 * Adds possibly missing ancestor nodes to the main node.
+	 * Adds possibly missing ancestor nodes specified in {@code keys}.
 	 *
-	 * @param ancestorKeys
+	 * @param keys An array of keys to add as ancestors.
 	 * @return A list of the added nodes.
 	 */
-	private List<Node> addMissingAncestors(String[] ancestorKeys) {
+	private List<Node> addMissingAncestors(String[] keys) {
 		List<Node> added = new ArrayList<>();
-		SectionNode constructionNode = getMainNode();
+		SectionNode parent = getMainNode();
 
-		for (String ancestorKey : ancestorKeys) {
-			Node ancestor = constructionNode.get(ancestorKey);
-			// todo add copying comments
-			SectionNode newNode = new SectionNode(ancestorKey, "#ligma", constructionNode, -1);
-			if (ancestor == null) {
-				constructionNode.add(newNode);
+		for (String key : keys) {
+			Node node = parent.get(key);
+			if (node == null) {
+				// TODO COMMENT SUPPORT
+				SectionNode newNode = new SectionNode(key, "", parent, -1);
+				parent.add(newNode);
 				added.add(newNode);
 			} else {
-				Preconditions.checkArgument(ancestor instanceof SectionNode, "ancestor is not a section node");
-				constructionNode = (SectionNode) ancestor;
+				Preconditions.checkArgument(node instanceof SectionNode, "node is not a section node");
+				parent = (SectionNode) node;
 			}
 		}
 
@@ -234,11 +244,11 @@ public class Config implements Comparable<Config> {
 	 * @param node The parent node to search.
 	 * @param key  The built key of the current node.
 	 *             Should be empty when calling this method outside the method itself.
-	 * @return A set of the discovered keys.
+	 * @return A set of the discovered keys, guaranteed to be in the order of discovery.
 	 */
 	@Contract(pure = true)
-	private Set<String> findKeys(@NotNull SectionNode node, @NotNull String key) {
-		Set<String> keys = new HashSet<>();
+	private static Set<String> findKeys(@NotNull SectionNode node, @NotNull String key) {
+		Set<String> keys = new LinkedHashSet<>();
 
 		if (!key.isEmpty()) {
 			key += ".";
