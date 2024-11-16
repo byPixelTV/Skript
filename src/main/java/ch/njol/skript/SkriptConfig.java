@@ -336,107 +336,60 @@ public class SkriptConfig {
 	public static Config getConfig() {
 		return mainConfig;
 	}
-	
-	// also used for reloading
-	static boolean load() {
+
+	/**
+	 * Reloads the main config file.
+	 */
+	static void load() {
 		try {
-			final File oldConfigFile = new File(Skript.getInstance().getDataFolder(), "config.cfg");
-			final File configFile = new File(Skript.getInstance().getDataFolder(), "config.sk");
-			if (oldConfigFile.exists()) {
-				if (!configFile.exists()) {
-					oldConfigFile.renameTo(configFile);
-					Skript.info("[1.3] Renamed your 'config.cfg' to 'config.sk' to match the new format");
-				} else {
-					Skript.error("Found both a new and an old config, ignoring the old one");
-				}
-			}
+			File configFile = new File(Skript.getInstance().getDataFolder(), "config.sk");
+
 			if (!configFile.exists()) {
 				Skript.error("Config file 'config.sk' does not exist!");
-				return false;
+				return;
 			}
 			if (!configFile.canRead()) {
 				Skript.error("Config file 'config.sk' cannot be read!");
-				return false;
+				return;
 			}
-			
-			Config mc;
-			try {
-				mc = new Config(configFile, false, false, ":");
-			} catch (final IOException e) {
-				Skript.error("Could not load the main config: " + e.getLocalizedMessage());
-				return false;
-			}
-			mainConfig = mc;
 
-			String configVersion = mc.get(version.key);
-			if (configVersion == null || Skript.getVersion().compareTo(new Version(configVersion)) != 0) {
-				try {
-					final InputStream in = Skript.getInstance().getResource("config.sk");
-					if (in == null) {
-						Skript.error("Your config is outdated, but Skript couldn't find the newest config in its jar.");
-						return false;
-					}
-					final Config newConfig = new Config(in, "Skript.jar/config.sk", false, false, ":");
-					in.close();
-					
-					boolean forceUpdate = false;
-					
-					if (mc.getMainNode().get("database") != null) { // old database layout
-						forceUpdate = true;
-						try {
-							final SectionNode oldDB = (SectionNode) mc.getMainNode().get("database");
-							assert oldDB != null;
-							final SectionNode newDBs = (SectionNode) newConfig.getMainNode().get(databases.key);
-							assert newDBs != null;
-							final SectionNode newDB = (SectionNode) newDBs.get("database 1");
-							assert newDB != null;
-							
-							newDB.setValues(oldDB);
-							
-							// '.db' was dynamically added before
-							final String file = newDB.getValue("file");
-							assert file != null;
-							if (!file.endsWith(".db"))
-								newDB.set("file", file + ".db");
-							
-							final SectionNode def = (SectionNode) newDBs.get("default");
-							assert def != null;
-							def.set("backup interval", "" + mc.get("variables backup interval"));
-						} catch (final Exception e) {
-							Skript.error("An error occurred while trying to update the config's database section.");
-							Skript.error("You'll have to update the config yourself:");
-							Skript.error("Open the new config.sk as well as the created backup, and move the 'database' section from the backup to the start of the 'databases' section");
-							Skript.error("of the new config (i.e. the line 'databases:' should be directly above 'database:'), and add a tab in front of every line that you just copied.");
-							return false;
-						}
-					}
-					
-					if (newConfig.setValues(mc, version.key, databases.key) || forceUpdate) { // new config is different
-						final File bu = FileUtils.backup(configFile);
-						newConfig.getMainNode().set(version.key, Skript.getVersion().toString());
-						if (mc.getMainNode().get(databases.key) != null)
-							newConfig.getMainNode().set(databases.key, mc.getMainNode().get(databases.key));
-						mc = mainConfig = newConfig;
-						mc.save(configFile);
-						Skript.info("Your configuration has been updated to the latest version. A backup of your old config file has been created as " + bu.getName());
-					} else { // only the version changed
-						mc.getMainNode().set(version.key, Skript.getVersion().toString());
-						mc.save(configFile);
-					}
-				} catch (final IOException e) {
-					Skript.error("Could not load the new config from the jar file: " + e.getLocalizedMessage());
-				}
+			Config mainConfig;
+			try {
+				mainConfig = new Config(configFile, false, false, ":");
+			} catch (IOException ex) {
+				Skript.exception(ex, "Could not load the main config");
+				return;
 			}
-			
-			mc.load(SkriptConfig.class);
-			
-//			if (!keepConfigsLoaded.value())
-//				mainConfig = null;
-		} catch (final RuntimeException e) {
-			Skript.exception(e, "An error occurred while loading the config");
-			return false;
+			SkriptConfig.mainConfig = mainConfig;
+
+			String configVersion = mainConfig.get(version.key);
+//			if (configVersion == null || Skript.getVersion().compareTo(new Version(configVersion)) != 0) { TODO
+				try (InputStream stream = Skript.getInstance().getResource("config.sk")) {
+					if (stream == null) {
+						Skript.error("Your config is outdated, but Skript couldn't find the newest config in its jar.");
+						return;
+					}
+					Config newConfig = new Config(stream, "Skript.jar/config.sk", false, false, ":");
+
+					boolean updated = mainConfig.updateKeys(newConfig/*, version.key, databases.key */);
+					mainConfig.getMainNode().set(version.key, Skript.getVersion().toString());
+					mainConfig.save(configFile);
+
+					if (updated) {
+						File backup = FileUtils.backup(configFile);
+						Skript.info("Your configuration has been updated to the latest version. " +
+							"A backup of your old config file has been created as " + backup.getName());
+					}
+				} catch (IOException ex) {
+					Skript.exception(ex, "Could not load the main config");
+					return;
+				}
+//			}
+
+			mainConfig.load(SkriptConfig.class);
+		} catch (RuntimeException ex) {
+			Skript.exception(ex, "An error occurred while loading the config");
 		}
-		return true;
 	}
 
 }
