@@ -190,6 +190,7 @@ public class Config implements Comparable<Config> {
 		return true;
 	}
 
+	// TODO COPY VOIDNODES RELATIVE TO
 	private void updateEntry(@NotNull String key, @NotNull EntryNode node) {
 		int idx = node.getIndex();
 		int splitAt = key.lastIndexOf('.');
