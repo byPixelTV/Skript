@@ -15,7 +15,7 @@ public class InputModule {
 		if (!Skript.classExists("org.bukkit.Input"))
 			return;
 
-		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit.input", "elements");
+		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit.input.elements");
 
 		Classes.registerClass(new EnumClassInfo<>(InputKey.class, "inputkey", "input keys")
 			.user("input ?keys?")
