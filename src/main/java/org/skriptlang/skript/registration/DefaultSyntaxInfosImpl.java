@@ -27,7 +27,7 @@ final class DefaultSyntaxInfosImpl {
 			Collection<String> patterns, Priority priority, @Nullable Class<R> returnType
 		) {
 			super(origin, type, supplier, patterns, priority);
-			Preconditions.checkArgument(returnType != null, "An expression syntax info must have a return type.");
+			Preconditions.checkNotNull(returnType, "An expression syntax info must have a return type.");
 			this.returnType = returnType;
 		}
 
