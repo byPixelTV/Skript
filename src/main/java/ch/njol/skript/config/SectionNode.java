@@ -6,7 +6,6 @@ import ch.njol.skript.config.validate.EntryValidator;
 import ch.njol.skript.config.validate.SectionValidator;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.NonNullPair;
-import ch.njol.util.NullableChecker;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.CheckedIterator;
 import com.google.common.base.Preconditions;
@@ -130,6 +129,20 @@ public class SectionNode extends Node implements Iterable<Node> {
 	 */
 	public @Nullable Node get(@Nullable String key) {
 		return getNodeMap().get(key);
+	}
+
+	/**
+	 * Gets the node at the specified index. May be null.
+	 * The index includes all nodes, including void nodes.
+	 *
+	 * @param idx The index of the node to get
+	 * @return The node at the specified index. May be null.
+	 * @throws IllegalArgumentException if the index is out of bounds
+	 */
+	public @Nullable Node getFull(int idx) {
+		Preconditions.checkArgument(idx >= 0 && idx < size(), "idx out of bounds: %s", idx);
+
+		return nodes.get(idx);
 	}
 
 	public @Nullable String getValue(@Nullable String key) {
