@@ -41,7 +41,7 @@ public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 		if (SUPPORTS_TIME_STATES && getTime() == EventValues.TIME_NOW && event instanceof PlayerInputEvent inputEvent)
 			eventPlayer = inputEvent.getPlayer();
 
-        List<InputKey> inputKeys = new ArrayList<>();
+		List<InputKey> inputKeys = new ArrayList<>();
 		for (Player player : source) {
 			if (player.equals(eventPlayer)) {
 				inputKeys.addAll(InputKey.fromInput(((PlayerInputEvent) event).getInput()));
